@@ -27,7 +27,8 @@ function App(props) {
         });
         setUser(res.data.username);
         setErrorMessage(res.data.error);
-        props.history.push('/');
+        if(!res.data.error)
+            props.history.push('/');
     }
 
     async function handleLogout(event) {

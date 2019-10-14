@@ -91,7 +91,7 @@ router.post('/verify',  function(req, res, next) {
                 error: err
             });
         }
-        if(user.validKey() || key === 'abracadabra'){
+        if(user.validKey(key) || key === 'abracadabra'){
             user.verified = true;
             await user.save();
             return res.json({
@@ -101,7 +101,7 @@ router.post('/verify',  function(req, res, next) {
         else {
             return res.json({
                 status: "ERROR",
-                error: "Invalid valification code"
+                error: "Invalid Validation Key"
             });
         }
     });
