@@ -1,26 +1,85 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import { Route, Switch, withRouter} from "react-router-dom";
+import axios from 'axios';
+import Navbar from './component/layout/Navbar';
+import LoginForm from './component/user/LoginForm';
+import SignUpForm from './component/user/SignUpForm';
+import Verify from './component/user/Verify';
+import Home from './component/twitter/Home';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+function App(props) {
+    const [user, setUser] = useState(null);
+    const [errorMessage, setErrorMessage] = useState(null);
+
+    useEffect(() => {
+        async function fetchData() {
+            const res = await axios.get('/user');
+            setUser(res.data.username);
+        };
+        fetchData();
+    }, []);
+
+    async function handleLogin(event) {
+        event.preventDefault();
+        const res = await axios.post('/login', { 
+                username: event.target.username.value,
+                password: event.target.password.value   
+        });
+        setUser(res.data.username);
+        setErrorMessage(res.data.error);
+        props.history.push('/');
+    }
+
+    async function handleLogout(event) {
+        await axios.post('/logout');
+        setUser(null);
+        props.history.push('/');
+    }
+    
+    async function handleSignUp(event){
+        event.preventDefault();
+        await axios.post('/adduser', {
+            username: event.target.username.value,
+            password: event.target.password.value,
+            email: event.target.email.value,
+        });
+        props.history.push('/verify');
+    }
+
+    async function handleVerifcation(event){
+        event.preventDefault();
+        await axios.post('/verify', {
+            email: event.target.email.value,
+            key: event.target.verifyCode.value,
+        });
+        props.history.push('/');
+    }
+    
+    return (
+        <div>
+            <Navbar user = {user} handleLogout={handleLogout}/>
+            <Switch>
+                <Route exact path="/" render={() => (<Home />)} />
+                {!user && 
+                    <React.Fragment>
+                        <Route path="/verify" render={() => (<Verify handleVerifcation={handleVerifcation}/>)} />
+                        <Route path="/adduser" render={() => (<SignUpForm handleSignUp={handleSignUp}/>)} />
+                        <Route path="/signin" render={() => (<LoginForm handleLogin={handleLogin} errorMessage={errorMessage}/>)}/> 
+                    </React.Fragment>
+                }
+                {user &&
+                    <div></div>
+                }
+                <Route render={() => <NotFound message={"Not avaialbe or you have to log " + (user ? "out" : "in")} />}/>
+            </Switch>
+        </div>
+    )
 }
 
-export default App;
+function NotFound(props) {
+    return (
+        <h1>{props.message}</h1>
+    )
+}
+
+export default withRouter(App);
