@@ -6,6 +6,7 @@ import LoginForm from './component/user/LoginForm';
 import SignUpForm from './component/user/SignUpForm';
 import Verify from './component/user/Verify';
 import Home from './component/twitter/Home';
+import AddItem from './component/twitter/AddItem';
 
 function App(props) {
     const [user, setUser] = useState(null);
@@ -55,6 +56,17 @@ function App(props) {
         });
         props.history.push('/');
     }
+
+    // add item function 
+    async function handleAddItem(event){
+        event.preventDefault();
+        await axios.post('/additem', {
+            username: user,
+            content: event.target.content.value,
+            childType: null// may need a function to check childtype
+        });
+        props.history.push('/');
+    }
     
     return (
         <div>
@@ -69,7 +81,9 @@ function App(props) {
                     </React.Fragment>
                 }
                 {user &&
-                    <div></div>
+                    <React.Fragment>
+                            <Route path="/additem" render={() => (<AddItem handleAddItem={handleAddItem}/>)} />
+                    </React.Fragment>
                 }
                 <Route render={() => <NotFound message={"Not avaialbe or you have to log " + (user ? "out" : "in")} />}/>
             </Switch>

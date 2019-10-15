@@ -11,6 +11,7 @@ const mongoose = require('mongoose');
 const MongoStore = require('connect-mongo')(session);
 
 const userRouter = require('./routes/user');
+const itemRouter = require('./routes/item');
 
 const app = express();
 
@@ -44,6 +45,8 @@ app.use(function(req, res, next) {
   next();
 });
 
+//new item router
+app.use('/', itemRouter);
 app.use('/', userRouter);
 
 app.get("/*", function(req, res, next) {

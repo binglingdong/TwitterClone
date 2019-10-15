@@ -7,6 +7,7 @@ function Navbar (props){
             <Link className="navbar-brand" to="/">Twitter</Link>
             {props.user &&
                 <div>
+                    <Link className="btn btn-outline-success my-2 my-sm-0" to="/additem">Add Item</Link>
                     <button className="btn btn-outline-success my-2 my-sm-0" onClick={props.handleLogout}>Log out</button>
                 </div>
             }
