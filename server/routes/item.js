@@ -1,29 +1,37 @@
 const express = require("express");
 const router = express.Router();
-const Items = require('../models/item');
-const uuidv4 = require('uuid/v4');
+const Item = require('../models/item');
+const uuidv1 = require('uuid/v1');
 
 //add item to db
 router.post('/additem', async function(req, res, next) {
     //deal error cases??
-    if(req.body.content==null){
+    if(req.user.username==null){
+        return res.json({
+            status: "error",
+            error: "Need to login..."
+        });
+    }
+    if(req.body.content==null ){
         return res.json({
             status: "error",
             error: "Empty content is not allowed"
         });
     }
-    const id = uuidv4();
-    const newitem = new Items({
+    const id = uuidv1();
+    const currentUnixTime = + new Date();
+    console.log(currentUnixTime);
+    const newitem = new Item({
         id: id,
-        username: req.body.username,
+        username: req.user.username,
         content: req.body.content,
         childType: req.body.childType,
         retweeted: 0,
         property: { likes:0 },
-        timestamp: new Date()
+        timestamp: currentUnixTime
     });
     await newitem.save();
-    const item = await Items.findOne({ id:id });
+    const item = await Item.findOne({ id:id });
     console.log(item);
     return res.json({
         status: "OK",

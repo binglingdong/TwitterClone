@@ -17,4 +17,4 @@ const itemSchema = new Schema({
     timestamp: Date
 });
 
-module.exports = mongoose.model('Items', itemSchema);
+module.exports = mongoose.model('Item', itemSchema);

@@ -61,7 +61,6 @@ function App(props) {
     async function handleAddItem(event){
         event.preventDefault();
         await axios.post('/additem', {
-            username: user,
             content: event.target.content.value,
             childType: null// may need a function to check childtype
         });
