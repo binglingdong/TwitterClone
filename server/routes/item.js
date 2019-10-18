@@ -19,8 +19,8 @@ router.post('/additem', async function(req, res, next) {
         });
     }
     const id = uuidv1();
-    const currentUnixTime = + new Date();
-    console.log(currentUnixTime);
+    const currentUnixTime = parseInt((new Date().getTime() / 1000).toFixed(0));
+   // console.log(currentUnixTime);
     const newitem = new Item({
         id: id,
         username: req.user.username,
@@ -31,8 +31,8 @@ router.post('/additem', async function(req, res, next) {
         timestamp: currentUnixTime
     });
     await newitem.save();
-    const item = await Item.findOne({ id:id });
-    console.log(item);
+    //const item = await Item.findOne({ id:id });
+    //console.log(item);
     return res.json({
         status: "OK",
         id : id
@@ -52,7 +52,7 @@ router.post('/search', async function(req, res, next) {
         }
     }
     if(req.body.timestamp.length != 0){
-        unixTime = parseInt((new Date(req.body.timestamp).getTime() / 1000).toFixed(0));
+        unixTime = parseInt((new Date(req.body.timestamp).getTime() / 1000).toFixed(0))+86400; //adding an extra day
         if(unixTime<=0){
             return res.json({
                 status: "error",
@@ -60,8 +60,27 @@ router.post('/search', async function(req, res, next) {
             });
         }
     }
-    // console.log(unixTime);
-    // console.log(limit);
+    await Item.find({timestamp:{$lt: unixTime}}, async function (err, result) {
+        //console.log(result);
+        if(err){
+            return res.json({
+                status: "error",
+                error: err
+            });
+        }
+        if(result.length == 0){
+            return res.json({
+                status: "error",
+                error: "No result"
+            });
+        }
+        else{
+            return res.json({
+                status: "OK",
+                items:result
+            });
+        }
+    }).limit(limit);
 
 });
 

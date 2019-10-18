@@ -14,7 +14,7 @@ const itemSchema = new Schema({
     property:{
         likes: Number,
     },
-    timestamp: Date
+    timestamp: Number,
 });
 
 module.exports = mongoose.model('Item', itemSchema);
