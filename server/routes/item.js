@@ -40,12 +40,29 @@ router.post('/additem', async function(req, res, next) {
 });
 
 router.post('/search', async function(req, res, next) {
-    console.log(req.body.timestamp);
-    if(req.body.limit == undefined){
-        limit = 25;
-    }else{
-        limit = req.body.limit;
+    let limit = 25;
+    let unixTime = parseInt((new Date().getTime() / 1000).toFixed(0));
+    if(req.body.limit.length != 0){
+        limit = parseInt(req.body.limit);
+        if(limit>100 || limit<=0){
+            return res.json({
+                status: "error",
+                error: "Limit out of range"
+            });
+        }
     }
+    if(req.body.timestamp.length != 0){
+        unixTime = parseInt((new Date(req.body.timestamp).getTime() / 1000).toFixed(0));
+        if(unixTime<=0){
+            return res.json({
+                status: "error",
+                error: "Invalid unix time"
+            });
+        }
+    }
+    // console.log(unixTime);
+    // console.log(limit);
+
 });
 
 module.exports = router;

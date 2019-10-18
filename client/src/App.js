@@ -22,10 +22,9 @@ function App(props) {
 
     async function handleSearch(event) {
         event.preventDefault();
-        let unixTime = parseInt((new Date(event.target.dateField.value).getTime() / 1000).toFixed(0));
         const res = await axios.post('/search', { 
-            timestamp: unixTime,
-            limit: event.target.limitField.value   
+            timestamp: event.target.dateField.value,
+            limit: event.target.limitField.value,
             //name: event.target.searchField.value
         });
     }   
