@@ -20,6 +20,16 @@ function App(props) {
         fetchData();
     }, []);
 
+    async function handleSearch(event) {
+        event.preventDefault();
+        let unixTime = parseInt((new Date(event.target.dateField.value).getTime() / 1000).toFixed(0));
+        const res = await axios.post('/search', { 
+            timestamp: unixTime,
+            limit: event.target.limitField.value   
+            //name: event.target.searchField.value
+        });
+    }   
+
     async function handleLogin(event) {
         event.preventDefault();
         const res = await axios.post('/login', { 
@@ -69,7 +79,7 @@ function App(props) {
     
     return (
         <div>
-            <Navbar user = {user} handleLogout={handleLogout}/>
+            <Navbar user = {user} handleLogout={handleLogout} handleSearch= {handleSearch}/>
             <Switch>
                 <Route exact path="/" render={() => (<Home />)} />
                 {!user && 

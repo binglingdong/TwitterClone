@@ -11,7 +11,7 @@ router.post('/additem', async function(req, res, next) {
             status: "error",
             error: "Need to login..."
         });
-    }
+    } 
     if(req.body.content==null ){
         return res.json({
             status: "error",
@@ -39,5 +39,13 @@ router.post('/additem', async function(req, res, next) {
     });
 });
 
+router.post('/search', async function(req, res, next) {
+    console.log(req.body.timestamp);
+    if(req.body.limit == undefined){
+        limit = 25;
+    }else{
+        limit = req.body.limit;
+    }
+});
 
 module.exports = router;
