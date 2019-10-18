@@ -100,7 +100,7 @@ router.post('/verify',  function(req, res, next) {
         }
         else {
             return res.json({
-                status: "ERROR",
+                status: "error",
                 error: "Invalid Validation Key"
             });
         }

@@ -7,10 +7,12 @@ import SignUpForm from './component/user/SignUpForm';
 import Verify from './component/user/Verify';
 import Home from './component/twitter/Home';
 import AddItem from './component/twitter/AddItem';
+import SearchResult from './component/twitter/SearchResult';
 
 function App(props) {
     const [user, setUser] = useState(null);
     const [errorMessage, setErrorMessage] = useState(null);
+    const [searchResult, setSearchResult] = useState([]);
 
     useEffect(() => {
         async function fetchData() {
@@ -19,22 +21,6 @@ function App(props) {
         };
         fetchData();
     }, []);
-
-    async function handleSearch(event) {
-        event.preventDefault();
-        let unixTime;
-        if(event.target.dateField.value.length != 0){
-            unixTime = parseInt((new Date(event.target.dateField.value).getTime() / 1000).toFixed(0))+86399; //adding an extra day when passing the input from datepicker.
-        }
-
-        //At this point. If the request is sent from the front end, it will go through the checks above. 
-        //If no time provided, leave it blank, if provided, use datepicker.value + one day to include today in the search result. 
-        const res = await axios.post('/search', { 
-            timestamp: unixTime,
-            limit: event.target.limitField.value,
-            //name: event.target.searchField.value
-        });
-    }   
 
     async function handleLogin(event) {
         event.preventDefault();
@@ -82,12 +68,34 @@ function App(props) {
         });
         props.history.push('/');
     }
+
+    
+    async function handleSearch(event) {
+        event.preventDefault();
+        let unixTime;
+        if(event.target.dateField.value.length != 0){
+            unixTime = parseInt((new Date(event.target.dateField.value).getTime() / 1000).toFixed(0))+86399; //adding an extra day when passing the input from datepicker.
+        }
+
+        //At this point. If the request is sent from the front end, it will go through the checks above. 
+        //If no time provided, leave it blank, if provided, use datepicker.value + one day to include today in the search result. 
+        const res = await axios.post('/search', { 
+            timestamp: unixTime,
+            limit: parseInt(event.target.limitField.value)
+            //name: event.target.searchField.value
+        });
+        if(!res.data.error){
+            setSearchResult(res.data.items);
+            props.history.push('/searchresult');
+        }
+    }
     
     return (
         <div>
             <Navbar user = {user} handleLogout={handleLogout} handleSearch= {handleSearch}/>
             <Switch>
                 <Route exact path="/" render={() => (<Home />)} />
+                <Route exact path="/searchresult" render={() => (<SearchResult searchResult={searchResult} />)} />
                 {!user && 
                     <React.Fragment>
                         <Route path="/verify" render={() => (<Verify handleVerifcation={handleVerifcation}/>)} />
