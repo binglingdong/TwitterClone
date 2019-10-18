@@ -22,8 +22,15 @@ function App(props) {
 
     async function handleSearch(event) {
         event.preventDefault();
+        let unixTime;
+        if(event.target.dateField.value.length != 0){
+            unixTime = parseInt((new Date(event.target.dateField.value).getTime() / 1000).toFixed(0))+86399; //adding an extra day when passing the input from datepicker.
+        }
+
+        //At this point. If the request is sent from the front end, it will go through the checks above. 
+        //If no time provided, leave it blank, if provided, use datepicker.value + one day to include today in the search result. 
         const res = await axios.post('/search', { 
-            timestamp: event.target.dateField.value,
+            timestamp: unixTime,
             limit: event.target.limitField.value,
             //name: event.target.searchField.value
         });

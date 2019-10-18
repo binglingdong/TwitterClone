@@ -40,28 +40,36 @@ router.post('/additem', async function(req, res, next) {
 });
 
 router.post('/search', async function(req, res, next) {
-    let limit = 25;
-    let unixTime = parseInt((new Date().getTime() / 1000).toFixed(0));
-    if(req.body.limit.length != 0){
-        limit = parseInt(req.body.limit);
-        if(limit>100 || limit<=0){
-            return res.json({
-                status: "error",
-                error: "Limit out of range"
-            });
-        }
+    //If the search request is sent from the front-end, it will arrived with modified time. 
+    //Then check to see if any value is null, if it's set to default. 
+    let unixTime = req.body.timestamp;
+    let limit = req.body.limit;     
+         
+    if(limit == undefined || limit.length == 0){ //If no limit provided.
+        limit = 25;//Default limit is 25
+    }else{  
+        limit = parseInt(req.body.limit);   //Else, parse whatever to int.
     }
-    if(req.body.timestamp.length != 0){
-        unixTime = parseInt((new Date(req.body.timestamp).getTime() / 1000).toFixed(0))+86400; //adding an extra day
-        if(unixTime<=0){
-            return res.json({
-                status: "error",
-                error: "Invalid unix time"
-            });
-        }
+    if(unixTime == undefined || unixTime.length == 0){ //If no time provided.
+        unixTime = parseInt((new Date().getTime() / 1000).toFixed(0)); //Default to rightnow
     }
-    await Item.find({timestamp:{$lt: unixTime}}, async function (err, result) {
-        //console.log(result);
+
+    //Check constraint.
+    if(limit>100 || limit<=0){
+        return res.json({
+            status: "error",
+            error: "Limit out of range"
+        });
+    }
+    if(unixTime<=0){
+        return res.json({
+            status: "error",
+            error: "Invalid unix time"
+        });
+    }
+    
+    await Item.find({timestamp:{$lte: unixTime}}, async function (err, result) {
+        console.log(result);
         if(err){
             return res.json({
                 status: "error",
