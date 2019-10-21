@@ -8,6 +8,7 @@ import Verify from './component/user/Verify';
 import Home from './component/twitter/Home';
 import AddItem from './component/twitter/AddItem';
 import SearchResult from './component/twitter/SearchResult';
+import Item from './component/twitter/Item';
 
 function App(props) {
     const [user, setUser] = useState(null);
@@ -89,6 +90,13 @@ function App(props) {
             props.history.push('/searchresult');
         }
     }
+    async function handleItem(event) {
+        event.preventDefault();
+        const res = await axios.get('/item/:id');
+        if(!res.data.error){
+            props.history.push('/item/:id');
+        }
+    }
     
     return (
         <div>
@@ -101,11 +109,13 @@ function App(props) {
                         <Route path="/verify" render={() => (<Verify handleVerifcation={handleVerifcation}/>)} />
                         <Route path="/adduser" render={() => (<SignUpForm handleSignUp={handleSignUp}/>)} />
                         <Route path="/signin" render={() => (<LoginForm handleLogin={handleLogin} errorMessage={errorMessage}/>)}/> 
+                        <Route path="/item/:id" render={() => (<Item handleItem={handleItem}/>)} />
                     </React.Fragment>
                 }
                 {user &&
                     <React.Fragment>
                             <Route path="/additem" render={() => (<AddItem handleAddItem={handleAddItem}/>)} />
+                            <Route path="/item/:id" render={() => (<Item/>)} />
                     </React.Fragment>
                 }
                 <Route render={() => <NotFound message={"Not avaialbe or you have to log " + (user ? "out" : "in")} />}/>

@@ -73,4 +73,19 @@ router.post('/search', async function(req, res, next) {
     }).limit(limit);
 });
 
+router.get('/item/:id', async function(req, res, next) {
+    await Item.findOne({id:req.params.id}, async function (err, result) {
+        if(err){
+            return res.json({
+                status: "error",
+                error: err
+            });
+        }
+        return res.json({
+            status: "OK",
+            item: result,
+        });
+    }).limit(limit);
+});
+
 module.exports = router;

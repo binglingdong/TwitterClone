@@ -71,6 +71,7 @@ router.post('/login', function(req, res, next) {
                 username: req.user.username
             });
         });
+        //set session cookie?
     })(req, res, next);
 });
 
@@ -78,7 +79,7 @@ router.post('/logout', function(req, res, next) {
     req.logout();
     res.json({
         status: "OK"
-    });
+    });//status error?
 });
 
 router.post('/verify',  function(req, res, next) {
@@ -100,7 +101,7 @@ router.post('/verify',  function(req, res, next) {
         }
         else {
             return res.json({
-                status: "error",
+                status: "ERROR",
                 error: "Invalid Validation Key"
             });
         }
