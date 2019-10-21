@@ -83,9 +83,9 @@ router.get('/item/:id', async function(req, res, next) {
         }
         return res.json({
             status: "OK",
-            item: result,
+            item: result
         });
-    }).limit(limit);
+    });
 });
 
 module.exports = router;

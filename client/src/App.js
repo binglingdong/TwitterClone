@@ -74,7 +74,7 @@ function App(props) {
     async function handleSearch(event) {
         event.preventDefault();
         let unixTime;
-        if(event.target.dateField.value.length != 0){
+        if(event.target.dateField.value.length !== 0){
             unixTime = parseInt((new Date(event.target.dateField.value).getTime() / 1000).toFixed(0))+86399; //adding an extra day when passing the input from datepicker.
         }
 
@@ -90,32 +90,24 @@ function App(props) {
             props.history.push('/searchresult');
         }
     }
-    async function handleItem(event) {
-        event.preventDefault();
-        const res = await axios.get('/item/:id');
-        if(!res.data.error){
-            props.history.push('/item/:id');
-        }
-    }
-    
+
     return (
         <div>
             <Navbar user = {user} handleLogout={handleLogout} handleSearch= {handleSearch}/>
             <Switch>
                 <Route exact path="/" render={() => (<Home />)} />
                 <Route exact path="/searchresult" render={() => (<SearchResult searchResult={searchResult} />)} />
+                <Route path="/item/:id" render={() => (<Item />)} />
                 {!user && 
                     <React.Fragment>
                         <Route path="/verify" render={() => (<Verify handleVerifcation={handleVerifcation}/>)} />
                         <Route path="/adduser" render={() => (<SignUpForm handleSignUp={handleSignUp}/>)} />
                         <Route path="/signin" render={() => (<LoginForm handleLogin={handleLogin} errorMessage={errorMessage}/>)}/> 
-                        <Route path="/item/:id" render={() => (<Item handleItem={handleItem}/>)} />
                     </React.Fragment>
                 }
                 {user &&
                     <React.Fragment>
                             <Route path="/additem" render={() => (<AddItem handleAddItem={handleAddItem}/>)} />
-                            <Route path="/item/:id" render={() => (<Item/>)} />
                     </React.Fragment>
                 }
                 <Route render={() => <NotFound message={"Not avaialbe or you have to log " + (user ? "out" : "in")} />}/>
