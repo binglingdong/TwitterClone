@@ -1,5 +1,7 @@
+@import '~antd/dist/antd.css';
+
 body {
-    font-family: "Microsoft JhengHei UI Light", 'Source Sans Pro', sans-serif;
+    font-family: "Lato", 'Source Sans Pro', sans-serif;
 }
 
 Table {

@@ -1,30 +1,59 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from "react-router-dom";
-import axios from 'axios';
+import React, {useState} from 'react';
+import { Comment, Icon, Tooltip, Avatar } from 'antd';
 
 function Item(props) {
-    const { id } = useParams();
-    const [ item, setItem] = useState(null);
+    const [action, setAction] = useState(null);
 
-    useEffect(() => {
-        async function fetchData() {
-            const res = await axios.get('/item/' + id);
-            setItem(res.data.item);
-        };
-        fetchData();
-    }, []);
+    function like() {
+        setAction("liked");
+    };
+
+    const actions = [
+        <span key="comment-basic-like">
+            <Tooltip title="Like">
+                <Icon
+                type="like"
+                theme={action === 'liked' ? 'filled' : 'outlined'}
+                onClick={like}
+                />
+            </Tooltip>
+            <span style={{ paddingLeft: 8, cursor: 'auto' }}>{props.item.property.likes}</span>
+        </span>,
+        <span key="comment-basic-reply-to">Reply to</span>,
+    ];
 
     return ( 
             <div>
-                <h1>This item</h1>
-                <div>
-                    { item &&
-                        <React.Fragment>
-                            <p>{item.username}</p> 
-                            <p>{item.content}</p> 
-                        </React.Fragment>
-                    }
-                </div>
+                { !props.item &&
+                    <h1>Item not found.</h1>
+                }
+                { props.item &&
+                    <Comment
+                        actions={actions}
+                        author={<a>{props.item.username}</a>}
+                        avatar={
+                        <Avatar
+                            icon="user"
+                            alt={props.item.username}
+                        />
+                        }
+                        content={
+                        <p>
+                            {props.item.content}
+                        </p>
+                        }
+                        datetime={
+                            <React.Fragment>
+                                <Tooltip title={props.item.timestamp}>
+                                    <span>{props.item.timestamp}</span>
+                                </Tooltip>
+                                <Tooltip title={props.item.id}>
+                                    <span> ID: {props.item.id}</span>
+                                </Tooltip>
+                            </React.Fragment>
+                        }
+                    />
+                }
             </div>
 
     );

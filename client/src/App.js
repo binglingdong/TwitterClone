@@ -8,12 +8,13 @@ import Verify from './component/user/Verify';
 import Home from './component/twitter/Home';
 import AddItem from './component/twitter/AddItem';
 import SearchResult from './component/twitter/SearchResult';
-import Item from './component/twitter/Item';
+import SearchItem from './component/twitter/SearchItem';
 
 function App(props) {
     const [user, setUser] = useState(null);
     const [errorMessage, setErrorMessage] = useState(null);
     const [searchResult, setSearchResult] = useState([]);
+    const [item, setItem] = useState(null);
 
     useEffect(() => {
         async function fetchData() {
@@ -69,8 +70,15 @@ function App(props) {
         });
         props.history.push('/');
     }
-
     
+    async function handleGetTwitter(event){
+        event.preventDefault();
+        const id = event.target.twitter_id.value;
+        const res = await axios.get('/item/' + id);
+        setItem(res.data.item);
+        props.history.push('/item/' + id);
+    }
+
     async function handleSearch(event) {
         event.preventDefault();
         let unixTime;
@@ -95,9 +103,9 @@ function App(props) {
         <div>
             <Navbar user = {user} handleLogout={handleLogout} handleSearch= {handleSearch}/>
             <Switch>
-                <Route exact path="/" render={() => (<Home />)} />
+                <Route exact path="/" render={() => (<Home handleGetTwitter={handleGetTwitter}/>)} />
                 <Route exact path="/searchresult" render={() => (<SearchResult searchResult={searchResult} />)} />
-                <Route path="/item/:id" render={() => (<Item />)} />
+                <Route path="/item/:id" render={() => (<SearchItem item={item}/>)} />
                 {!user && 
                     <React.Fragment>
                         <Route path="/verify" render={() => (<Verify handleVerifcation={handleVerifcation}/>)} />

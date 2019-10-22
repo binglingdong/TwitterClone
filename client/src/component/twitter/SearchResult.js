@@ -1,14 +1,14 @@
 import React from 'react';
+import Item from './Item';
 
 function SearchResult(props) {
     return ( 
             <div>
                 <h1>Search Result</h1>
                 {
-                    props.searchResult.map(i => (
+                    props.searchResult.map((i, index) => (
                         <div>
-                            <p>{i.username}</p> 
-                            <p>{i.content}</p>
+                            <Item key={index} item={i}></Item>
                         </div>
                     ))
                 }
