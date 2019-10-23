@@ -8,7 +8,7 @@ function Item(props) {
         setAction("liked");
     };
 
-    const actions = [
+    const actions = props.item ? [
         <span key="comment-basic-like">
             <Tooltip title="Like">
                 <Icon
@@ -20,7 +20,7 @@ function Item(props) {
             <span style={{ paddingLeft: 8, cursor: 'auto' }}>{props.item.property.likes}</span>
         </span>,
         <span key="comment-basic-reply-to">Reply to</span>,
-    ];
+    ] : null;
 
     return ( 
             <div>
