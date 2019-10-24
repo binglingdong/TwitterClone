@@ -9,6 +9,7 @@ import Home from './component/twitter/Home';
 import AddItem from './component/twitter/AddItem';
 import SearchResult from './component/twitter/SearchResult';
 import SearchItem from './component/twitter/SearchItem';
+import { notification } from 'antd';
 
 function App(props) {
     const [user, setUser] = useState(null);
@@ -64,10 +65,17 @@ function App(props) {
     // add item function 
     async function handleAddItem(event){
         event.preventDefault();
-        await axios.post('/additem', {
+        const res = await axios.post('/additem', {
             content: event.target.content.value,
             childType: null// may need a function to check childtype
         });
+        const args = {
+            message: 'Tweet successfully added',
+            description:
+              'Id: ' + res.data.id,
+            duration: 0,
+        };
+        notification.open(args);
         props.history.push('/');
     }
     
