@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const passport = require('passport');
 const User = require('../models/user');
+const Item= require('../models/item');
 const nodemailer = require('nodemailer');
 const uuidv4 = require('uuid/v4');
 
@@ -111,10 +112,67 @@ router.post('/verify',  function(req, res, next) {
         }
     });
 });
+//
+router.get('/user/:username',  function(req, res, next) {
+    User.findOne({ 'username': req.params.username }, async function (err, user) {
+        if(err || user == null){
+            return res.json({
+                status: "error",
+                error: err
+            });
+        }
+        else{
+            return res.json({
+                status: "OK",
+                user: {
+                    username: user.username,
+                    email : user.email,
+                    followers : user.followers.length,
+                    following : user.following.length
+                }
+            });
+        }
+    });
+});
+
+
+router.get('/user/:username/posts',  function(req, res, next) {
+    const limit = req.query.limit || 50;
+    //Check constraint limit.
+    if(limit > 200 || limit < 0){
+        return res.json({
+            status: "error",
+            error: "Limit out of range"
+        });
+    }
+    User.findOne({ 'username': req.params.username }, async function (err, user) {
+        if(err || user == null){
+            return res.json({
+                status: "error",
+                error: err
+            });
+        }
+        else{
+            const items = Item.find({username:user.username}, async function (err,items ) {
+                if(err){
+                    return res.json({
+                        status: "error",
+                        error: err
+                    });
+                }
+                return res.json({
+                    status: "OK",
+                    items: items.slice(0,limit)
+                });
+            });
+        }
+    });
+});
+
 
 router.get('/user/:username/following',  async function(req, res, next) {
     const limit = req.query.limit || 50;
-    if(limit > 200 || limit <= 0){
+    if(limit > 200 || limit < 0){
         return res.json({
             status: "error",
             error: "Limit out of range"

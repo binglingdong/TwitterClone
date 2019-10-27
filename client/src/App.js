@@ -11,12 +11,14 @@ import SearchResult from './component/search/SearchResult';
 import Search from'./component/search/Search';
 import Item from'./component/twitter/Item';
 import { notification } from 'antd';
+import UserProfile from './component/user/UserProfile';
 
 function App(props) {
     const [user, setUser] = useState(null);
     const [errorMessage, setErrorMessage] = useState(null);
     const [searchResult, setSearchResult] = useState([]);
     const [item, setItem] = useState(null);
+    const [userprofile, setUserProfile] = useState(null);
 
     useEffect(() => {
         async function fetchData() {
@@ -133,6 +135,18 @@ function App(props) {
         }
     }
 
+    async function handleUserProfile(event) {
+        event.preventDefault();
+        const res = await axios.get('/user/'+event.target.targetuser, { 
+
+        });
+        if(!res.data.error){
+            setUserProfile(res.data.user);
+        }  
+    }
+
+
+
     return (
         <div>
             <Navbar user = {user} handleLogout={handleLogout}/>
@@ -141,6 +155,7 @@ function App(props) {
                 <Route exact path = "/search" render={() => (<Search handleSearch= {handleSearch} handleGetTwitter={handleGetTwitter}/>)} />
                 <Route exact path="/searchresult" render={() => (<SearchResult searchResult={searchResult} />)} />
                 <Route path="/item/:id" render={() => (<Item item={item} handleDeleteTwitter={handleDeleteTwitter}/>)} />
+                <Route path="/user/:username" render={() => (<UserProfile item={item} handleUserProfile={handleUserProfile}/>)} />
                 {!user && 
                     <React.Fragment>
                         <Route path="/verify" render={() => (<Verify handleVerifcation={handleVerifcation}/>)} />
