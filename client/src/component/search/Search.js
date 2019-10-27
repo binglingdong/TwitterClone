@@ -8,6 +8,11 @@ function toDateInputValue() {
 function Search(props) {
     return ( 
         <div>
+            <form onSubmit={props.handleGetTwitter}>
+                <input name="twitter_id" placeholder="Twitter ID" />
+                <button type="submit">Find</button>
+            </form>
+
             <form className="Search" onSubmit={props.handleSearch}>
                 <input className="mr-sm-2" type="search" placeholder="Search ID" name="searchById"></input>
                 <input className="mr-sm-2" type="search" placeholder="Search Contains" name="searchByString"></input>

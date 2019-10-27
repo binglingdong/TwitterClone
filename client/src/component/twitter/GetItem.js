@@ -1,7 +1,7 @@
 import React from 'react';
-import Item from '../twitter/Item';
+import Item from './Item';
 
-function SearchItem(props) {
+function GetItem(props) {
     return ( 
             <div>
                 <Item item={props.item}></Item>
@@ -10,4 +10,4 @@ function SearchItem(props) {
     );
 }
 
-export default SearchItem;
+export default GetItem;
