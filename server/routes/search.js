@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Item = require('../models/item');
+const User = require('../models/user');
 
 
 router.post('/search', async function(req, res, next) {
@@ -8,8 +9,12 @@ router.post('/search', async function(req, res, next) {
     //Then check to see if any value is null, if it's set to default. 
     const unixTime = req.body.timestamp || parseInt((new Date().getTime() / 1000).toFixed(0));
     const limit = req.body.limit || 25;
-    
-    //
+    let followingCheck = req.body.following == undefined ? true : req.body.following;
+    if(!req.user){
+        followingCheck = false;
+    }
+    const username = req.body.username || "";
+    const searchString = req.body.q || "";
     //Check constraint.
     if(limit > 100 || limit <= 0){
         return res.json({
@@ -23,21 +28,33 @@ router.post('/search', async function(req, res, next) {
             error: "Invalid unix time"
         });
     }
-    
-    await Item.find({timestamp:{$lte: unixTime}}, async function (err, result) {
-        console.log(result);
-        if(err){
-            return res.json({
-                status: "error",
-                error: err
-            });
-        }
-        return res.json({
-            status: "OK",
-            items: result
+    let searchReg = ".*"+searchString+".*";
+    let nameReg = ".*"+username+".*";
+    let result = [];
+    if(username==="" && searchString === ""){
+        result = await Item.find({timestamp:{$lte: unixTime}});
+    }else if(username === ""){
+        result = await Item.find( {$and: [{content: {$regex: searchReg, $options: 'i'}}, {timestamp:{$lte: unixTime}}]});
+    }else if(searchString === ""){
+        result = await Item.find( {$and:[{username: {$regex: nameReg, $options: 'i' }}, {timestamp:{$lte: unixTime}}]});
+    }
+    else{
+        result = await Item.find( {$and: [{username: {$regex: nameReg, $options: 'i' }},{content: {$regex: searchReg, $options : 'i'}},{timestamp:{$lte: unixTime}}]});    
+    }
+    //NOW result contains all the items that match the username and q. 
+    //NEXT need to filter the following.
+    if(followingCheck){
+        const user = await User.findOne({username:req.user.username});
+        followings = user.following;
+        result = result.filter(function (item) {
+            return (followings.includes(item.username));
         });
-    }).limit(limit);
+    }
+    
+    return res.json({
+        status: "OK",
+        items: result
+    });
 });
-
 
 module.exports = router;
