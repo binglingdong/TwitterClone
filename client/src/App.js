@@ -92,6 +92,22 @@ function App(props) {
         event.preventDefault();
         const id = event.target.twitter_id.value;
         const res = await axios.delete('/item/' + id);
+        const successArgs = {
+            message: 'Tweet successfully deleted',
+            description:
+              'Id: ' + id,
+            duration: 0,
+        };
+        const failArgs = {
+            message: 'Failed to delete Tweet',
+            description:
+              'Id: ' + id,
+            duration: 0,
+        };
+        if(res.data.status=="OK")
+            notification.open(successArgs);
+        else
+            notification.open(failArgs);
         //setItem(res.data.item);
         //props.history.push('/item/' + id);
     }

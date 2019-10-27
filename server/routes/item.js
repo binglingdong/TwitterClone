@@ -54,4 +54,19 @@ router.get('/item/:id', async function(req, res, next) {
     });
 });
 
+router.delete('/item/:id', async function(req, res, next) {
+    await Item.deleteOne({id:req.params.id}, async function (err, result) {
+        if(err){
+            return res.json({
+                status: "error",
+                error: err
+            });
+        }
+        return res.json({
+            status: "OK",
+            item: result
+        });
+    });
+});
+
 module.exports = router;

@@ -150,4 +150,53 @@ router.get('/user/:username/follower',  async function(req, res, next) {
         });
     });
 });
+
+router.post('/follow',  function(req, res, next) {
+    if(req.user){
+        const username = req.body.username;
+        const follow = req.body.follow;
+        if(follow==true){
+             User.update({username: req.user.username}, { $push: { following: username } }, (err, result) => {
+                if(err) {
+                    return res.json({
+                        status: "error"
+                    });
+                }
+            });
+            User.update({username: username}, { $push: { followers: req.user.username } }, (err, result) => {
+                if(err) {
+                    return res.json({
+                        status: "error"
+                    });
+                }
+            });
+            return res.json({
+                status: "OK"
+            });
+        }
+        else{
+            User.update({username: req.user.username}, { $pull: { following: username } }, (err, result) => {
+                if(err) {
+                    return res.json({
+                        status: "error"
+                    });
+                }
+            });
+            User.update({username: username}, { $pull: { followers: req.user.username } }, (err, result) => {
+                if(err) {
+                    return res.json({
+                        status: "error"
+                    });
+                }
+            });
+            return res.json({
+                status: "OK"
+            });
+        }
+    }
+    return res.json({
+        status: "error"
+    });
+});
+
 module.exports = router;
