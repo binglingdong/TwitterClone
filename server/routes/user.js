@@ -112,4 +112,42 @@ router.post('/verify',  function(req, res, next) {
     });
 });
 
+router.get('/user/:username/following',  async function(req, res, next) {
+    const limit = req.query.limit || 50;
+    if(limit > 200 || limit <= 0){
+        return res.json({
+            status: "error",
+            error: "Limit out of range"
+        });
+    }
+    await User.findOne({username:req.params.username}, function (err, result) {
+        if(err){
+            return res.json({
+                status: "error",
+                error: err
+            });
+        }
+
+        return res.json({
+            status: "OK",
+            users: result.following.slice(0, limit)
+        });
+    });
+});
+
+router.get('/user/:username/follower',  async function(req, res, next) {
+    const limit = req.query.limit || 50;
+    await User.findOne({username:req.params.username}, function (err, result) {
+        if(err){
+            return res.json({
+                status: "error",
+                error: err
+            });
+        }
+        return res.json({
+            status: "OK",
+            users: result.followers.slice(0, limit)
+        });
+    });
+});
 module.exports = router;
