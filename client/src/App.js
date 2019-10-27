@@ -94,26 +94,24 @@ function App(props) {
     async function handleDeleteTwitter(event){
         event.preventDefault();
         const id = event.target.twitter_id.value;
-        const res = await axios.delete('/item/' + id);
-        //alert(res.data.status);
-        const successArgs = {
-            message: 'Tweet successfully deleted',
-            description:
-              'Id: ' + id,
-            duration: 0,
-        };
-        const failArgs = {
-            message: 'Failed to delete Tweet',
-            description:
-              'Id: ' + id,
-            duration: 0,
-        };
-        if(res.data.status=="OK")
-            notification.open(successArgs);
-        else
-            notification.open(failArgs);
-        //setItem(res.data.item);
-        props.history.push('/');
+        axios.delete('/item/' + id)
+            .then(res=>{
+                notification['success']({
+                    message: 'Tweet successfully deleted',
+                    description:
+                    'Id: ' + id,
+                    duration: 0,
+                });
+            })
+            .catch(function(err) {
+                notification['error']({
+                    message: 'Failed to delete Tweet',
+                    description:
+                    'Id: ' + id,
+                    duration: 0,
+                });
+            });
+        //props.history.push('/');
     }
 
     async function handleSearch(event) {

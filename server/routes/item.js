@@ -56,14 +56,10 @@ router.get('/item/:id', async function(req, res, next) {
 
 router.delete('/item/:id', async function(req, res, next) {
     await Item.deleteOne({id:req.params.id}, async function (err, result) {
-        if(err){
-            return res.json({
-                status: "error"
-            });
+        if(err || result.deletedCount === 0){
+            return res.status(404).end()
         }
-        return res.json({
-            status: "OK"
-        });
+        return res.status(200).end()
     });
 });
 
