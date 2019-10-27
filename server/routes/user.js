@@ -209,22 +209,50 @@ router.get('/user/:username/followers',  async function(req, res, next) {
     });
 });
 
-router.post('/follow',  function(req, res, next) {
-    if(req.user){
+router.post('/follow',  async function(req, res, next) {
+    if(req.user) {
         const username = req.body.username;
         const follow = req.body.follow;
-        if(follow==true){
-             User.update({username: req.user.username}, { $push: { following: username } }, (err, result) => {
+        if(username===req.user.username)//cannot follow urself
+            return res.json({
+                status: "error",
+                error: "Can't follow yourself"
+            });
+        let user = await User.findOne({username:username});
+        //cannot follow nonexist user
+        if(!user) {
+            return res.json({
+                status: "error",
+                error: "User doesn't exist"
+            });
+        }
+        if(follow && req.user.following.includes(username)) {
+            return res.json({
+                status: "error",
+                error: "User is already following"
+            });
+        }
+        if(!follow && !req.user.following.includes(username)) {
+            return res.json({
+                status: "error",
+                error: "User isn't following"
+            });
+        }
+
+        if(follow){
+            await User.updateOne({username: req.user.username}, { $addToSet: { following: username } }, (err, result) => {
                 if(err) {
                     return res.json({
-                        status: "error"
+                        status: "error",
+                        error: err
                     });
                 }
             });
-            User.update({username: username}, { $push: { followers: req.user.username } }, (err, result) => {
+            await User.updateOne({username: username}, { $addToSet: { followers: req.user.username } }, (err, result) => {
                 if(err) {
                     return res.json({
-                        status: "error"
+                        status: "error",
+                        error: err
                     });
                 }
             });
@@ -233,14 +261,15 @@ router.post('/follow',  function(req, res, next) {
             });
         }
         else{
-            User.update({username: req.user.username}, { $pull: { following: username } }, (err, result) => {
+            await User.updateOne({username: req.user.username}, { $pull: { following: username } }, (err, result) => {
                 if(err) {
                     return res.json({
-                        status: "error"
+                        status: "error",
+                        error: err
                     });
                 }
             });
-            User.update({username: username}, { $pull: { followers: req.user.username } }, (err, result) => {
+            await User.updateOne({username: username}, { $pull: { followers: req.user.username } }, (err, result) => {
                 if(err) {
                     return res.json({
                         status: "error"

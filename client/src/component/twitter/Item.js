@@ -52,8 +52,14 @@ function Item(props) {
                                 </Tooltip>
                             </React.Fragment>
                         }
+                        
                     />
+                    
                 }
+                <form onSubmit={props.handleDeleteTwitter}>
+                    <input name="twitter_id" placeholder="Twitter ID" />
+                    <button type="submit">Delete</button>
+                </form>
             </div>
 
     );

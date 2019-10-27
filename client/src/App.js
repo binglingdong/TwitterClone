@@ -74,13 +74,12 @@ function App(props) {
             content: event.target.content.value,
             childType: null// may need a function to check childtype
         });
-        const args = {
+        notification['success']({
             message: 'Tweet successfully added',
             description:
               'Id: ' + res.data.id,
             duration: 0,
-        };
-        notification.open(args);
+        });
         props.history.push('/');
     }
     
@@ -96,6 +95,7 @@ function App(props) {
         event.preventDefault();
         const id = event.target.twitter_id.value;
         const res = await axios.delete('/item/' + id);
+        //alert(res.data.status);
         const successArgs = {
             message: 'Tweet successfully deleted',
             description:
@@ -113,7 +113,7 @@ function App(props) {
         else
             notification.open(failArgs);
         //setItem(res.data.item);
-        //props.history.push('/item/' + id);
+        props.history.push('/');
     }
 
     async function handleSearch(event) {
