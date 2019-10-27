@@ -118,11 +118,11 @@ function App(props) {
 
     return (
         <div>
-            <Navbar user = {user} handleLogout={handleLogout} handleSearch= {handleSearch}/>
+            <Navbar user = {user} handleLogout={handleLogout}/>
             <Switch>
-                <Route exact path = "/search" render={() => (<Search/>)} />
                 <Route exact path="/" render={() => (<Home handleGetTwitter={handleGetTwitter}/>)} />
                 <Route exact path="/searchresult" render={() => (<SearchResult searchResult={searchResult} />)} />
+                <Route exact path = "/search" render={() => (<Search handleSearch= {handleSearch}/>)} />
                 <Route path="/item/:id" render={() => (<SearchItem item={item} handleDeleteTwitter={handleDeleteTwitter}/>)} />
                 {!user && 
                     <React.Fragment>
