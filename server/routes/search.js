@@ -27,7 +27,8 @@ router.post('/search', async function(req, res, next) {
             error: "Invalid unix time"
         });
     }
-    const searchReg = ".*"+searchString+".*";
+    const searchReg = ".*"+searchString.replace(" ", "|") +".*";
+    console.log(searchReg);
     const nameReg = ".*"+username+".*";
     let result = [];
     if(username==="" && searchString === ""){
