@@ -45,15 +45,15 @@ router.post('/search', async function(req, res, next) {
     //NEXT need to filter the following.
     if(followingCheck){
         const user = await User.findOne({username:req.user.username});
-        followings = user.following;
+        const followings = user.following;
         result = result.filter(function (item) {
             return (followings.includes(item.username));
         });
     }
-    
+    //console.log(result);
     return res.json({
         status: "OK",
-        items: result
+        items: result.slice(-limit).reverse()
     });
 });
 
