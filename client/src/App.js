@@ -8,7 +8,6 @@ import Verify from './component/user/Verify';
 import Home from './component/twitter/Home';
 import AddItem from './component/twitter/AddItem';
 import SearchResult from './component/search/SearchResult';
-import GetItem from './component/twitter/GetItem';
 import Search from'./component/search/Search';
 import { notification } from 'antd';
 
@@ -141,7 +140,7 @@ function App(props) {
                 <Route exact path="/" render={() => (<Home/>)} />
                 <Route exact path = "/search" render={() => (<Search handleSearch= {handleSearch} handleGetTwitter={handleGetTwitter}/>)} />
                 <Route exact path="/searchresult" render={() => (<SearchResult searchResult={searchResult} />)} />
-                <Route path="/item/:id" render={() => (<GetItem item={item} handleDeleteTwitter={handleDeleteTwitter}/>)} />
+                <Route path="/item/:id" render={() => (<SearchItem item={item} handleDeleteTwitter={handleDeleteTwitter}/>)} />
                 {!user && 
                     <React.Fragment>
                         <Route path="/verify" render={() => (<Verify handleVerifcation={handleVerifcation}/>)} />
