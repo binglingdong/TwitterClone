@@ -162,7 +162,7 @@ router.get('/user/:username/posts',  function(req, res, next) {
                 }
                 return res.json({
                     status: "OK",
-                    items: items.slice(0,limit)
+                    items: items.slice(-limit)
                 });
             });
         }
@@ -188,7 +188,7 @@ router.get('/user/:username/following',  async function(req, res, next) {
 
         return res.json({
             status: "OK",
-            users: result.following.slice(0, limit)
+            users: result.following.slice(-limit)
         });
     });
 });
@@ -204,7 +204,7 @@ router.get('/user/:username/follower',  async function(req, res, next) {
         }
         return res.json({
             status: "OK",
-            users: result.followers.slice(0, limit)
+            users: result.followers.slice(-limit)
         });
     });
 });
