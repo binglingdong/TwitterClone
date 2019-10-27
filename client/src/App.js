@@ -107,7 +107,8 @@ function App(props) {
         //If no time provided, leave it blank, if provided, use datepicker.value + one day to include today in the search result. 
         const res = await axios.post('/search', { 
             timestamp: unixTime,
-            limit: parseInt(event.target.limitField.value)
+            limit: parseInt(event.target.limitField.value),
+            q: event.target.searchByString
             //name: event.target.searchField.value
         });
         if(!res.data.error){
@@ -121,8 +122,8 @@ function App(props) {
             <Navbar user = {user} handleLogout={handleLogout}/>
             <Switch>
                 <Route exact path="/" render={() => (<Home handleGetTwitter={handleGetTwitter}/>)} />
-                <Route exact path="/searchresult" render={() => (<SearchResult searchResult={searchResult} />)} />
                 <Route exact path = "/search" render={() => (<Search handleSearch= {handleSearch}/>)} />
+                <Route exact path="/searchresult" render={() => (<SearchResult searchResult={searchResult} />)} />
                 <Route path="/item/:id" render={() => (<SearchItem item={item} handleDeleteTwitter={handleDeleteTwitter}/>)} />
                 {!user && 
                     <React.Fragment>
