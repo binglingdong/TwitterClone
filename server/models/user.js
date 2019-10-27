@@ -14,7 +14,9 @@ const userSchema = new Schema({
         unique: true
     },
     verified:Boolean,
-    key:String
+    key:String,
+    followers: [String],
+    following: [String]
 });
 
 userSchema.methods.validPassword = function(password) {
