@@ -3,7 +3,6 @@ const router = express.Router();
 const Item = require('../models/item');
 const User = require('../models/user');
 
-
 router.post('/search', async function(req, res, next) {
     //If the search request is sent from the front-end, it will arrived with modified time. 
     //Then check to see if any value is null, if it's set to default. 
@@ -17,19 +16,19 @@ router.post('/search', async function(req, res, next) {
     const searchString = req.body.q || "";
     //Check constraint.
     if(limit > 100 || limit <= 0){
-        return res.json({
+        res.json({
             status: "error",
             error: "Limit out of range"
         });
     }
     if(unixTime<=0){
-        return res.json({
+        res.json({
             status: "error",
             error: "Invalid unix time"
         });
     }
-    let searchReg = ".*"+searchString+".*";
-    let nameReg = ".*"+username+".*";
+    const searchReg = ".*"+searchString+".*";
+    const nameReg = ".*"+username+".*";
     let result = [];
     if(username==="" && searchString === ""){
         result = await Item.find({timestamp:{$lte: unixTime}});
@@ -46,12 +45,9 @@ router.post('/search', async function(req, res, next) {
     if(followingCheck){
         const user = await User.findOne({username:req.user.username});
         const followings = user.following;
-        result = result.filter(function (item) {
-            return (followings.includes(item.username));
-        });
+        result = result.filter(item => followings.includes(item.username));
     }
-    //console.log(result);
-    return res.json({
+    res.json({
         status: "OK",
         items: result.slice(-limit).reverse()
     });

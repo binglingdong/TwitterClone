@@ -7,13 +7,13 @@ const uuidv1 = require('uuid/v1');
 router.post('/additem', async function(req, res, next) {
     //deal error cases
     if(!req.user){
-        return res.json({
+        res.json({
             status: "error",
             error: "Need to login"
         });
     } 
     if(!req.body.content){
-        return res.json({
+        res.json({
             status: "error",
             error: "Empty content is not allowed"
         });
@@ -32,22 +32,21 @@ router.post('/additem', async function(req, res, next) {
     await newitem.save();
     //const item = await Item.findOne({ id:id });
     //console.log(item);
-    return res.json({
+    res.json({
         status: "OK",
         id : id
     });
 });
 
-
 router.get('/item/:id', async function(req, res, next) {
     await Item.findOne({id:req.params.id}, async function (err, result) {
         if(err){
-            return res.json({
+            res.json({
                 status: "error",
                 error: err
             });
         }
-        return res.json({
+        res.json({
             status: "OK",
             item: result
         });
@@ -57,13 +56,10 @@ router.get('/item/:id', async function(req, res, next) {
 router.delete('/item/:id', async function(req, res, next) {
     await Item.deleteOne({id:req.params.id}, async function (err, result) {
         if(err || result.deletedCount === 0){
-            return res.status(404).end()
+            res.status(404).end()
         }
-        return res.status(200).end()
+        res.status(200).end()
     });
 });
-
-
-
 
 module.exports = router;
