@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 
 function UserProfile(props) {
     const { username } = useParams();
@@ -14,7 +14,7 @@ function UserProfile(props) {
             }  
         };
         fetchData();
-    });
+    }, []);
 
     return (
         <div>
@@ -22,8 +22,8 @@ function UserProfile(props) {
             <React.Fragment>
             <p>{userprofile.username}</p>
             <p> Email : {userprofile.email}</p>
-            <p> Following : {userprofile.following}</p>
-            <p> Follower : {userprofile.followers}</p>
+            <p> Following : <Link to={"/user/"+username+"/following"}>{userprofile.following}</Link></p>
+            <p> Follower : <Link to={"/user/"+username+"/followers"}>{userprofile.followers}</Link></p>
 
             </React.Fragment>
             }

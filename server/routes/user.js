@@ -193,7 +193,7 @@ router.get('/user/:username/following',  async function(req, res, next) {
     });
 });
 
-router.get('/user/:username/follower',  async function(req, res, next) {
+router.get('/user/:username/followers',  async function(req, res, next) {
     const limit = req.query.limit || 50;
     await User.findOne({username:req.params.username}, function (err, result) {
         if(err){

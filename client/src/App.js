@@ -10,6 +10,8 @@ import AddItem from './component/twitter/AddItem';
 import SearchResult from './component/search/SearchResult';
 import Search from'./component/search/Search';
 import Item from'./component/twitter/Item';
+import Following from'./component/user/Following';
+import Followers from'./component/user/Followers';
 import { notification } from 'antd';
 import UserProfile from './component/user/UserProfile';
 
@@ -154,8 +156,10 @@ function App(props) {
                 <Route exact path="/" render={() => (<Home/>)} />
                 <Route exact path = "/search" render={() => (<Search handleSearch= {handleSearch} handleGetTwitter={handleGetTwitter}/>)} />
                 <Route exact path="/searchresult" render={() => (<SearchResult searchResult={searchResult} />)} />
-                <Route path="/item/:id" render={() => (<Item item={item} handleDeleteTwitter={handleDeleteTwitter}/>)} />
-                <Route path="/user/:username" render={() => (<UserProfile item={item} handleUserProfile={handleUserProfile}/>)} />
+                <Route exact path="/item/:id" render={() => (<Item item={item} handleDeleteTwitter={handleDeleteTwitter}/>)} />
+                <Route exact path="/user/:username" render={() => (<UserProfile item={item} handleUserProfile={handleUserProfile}/>)} />
+                <Route path="/user/:username/following" render={() => (<Following />)} />
+                <Route path="/user/:username/followers" render={() => (<Followers />)} />
                 {!user && 
                     <React.Fragment>
                         <Route path="/verify" render={() => (<Verify handleVerifcation={handleVerifcation}/>)} />
