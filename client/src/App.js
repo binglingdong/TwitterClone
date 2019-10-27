@@ -88,6 +88,14 @@ function App(props) {
         props.history.push('/item/' + id);
     }
 
+    async function handleDeleteTwitter(event){
+        event.preventDefault();
+        const id = event.target.twitter_id.value;
+        const res = await axios.delete('/item/' + id);
+        //setItem(res.data.item);
+        //props.history.push('/item/' + id);
+    }
+
     async function handleSearch(event) {
         event.preventDefault();
         let unixTime;
@@ -115,7 +123,7 @@ function App(props) {
                 <Route exact path = "/search" render={() => (<Search/>)} />
                 <Route exact path="/" render={() => (<Home handleGetTwitter={handleGetTwitter}/>)} />
                 <Route exact path="/searchresult" render={() => (<SearchResult searchResult={searchResult} />)} />
-                <Route path="/item/:id" render={() => (<SearchItem item={item}/>)} />
+                <Route path="/item/:id" render={() => (<SearchItem item={item} handleDeleteTwitter={handleDeleteTwitter}/>)} />
                 {!user && 
                     <React.Fragment>
                         <Route path="/verify" render={() => (<Verify handleVerifcation={handleVerifcation}/>)} />
