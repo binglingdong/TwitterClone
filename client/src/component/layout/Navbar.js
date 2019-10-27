@@ -8,6 +8,7 @@ function Navbar (props){
             {props.user &&
                 <div>
                     <Link className="btn btn-outline-success my-2 my-sm-0" to="/additem">Add Item</Link>
+                    <Link className="btn btn-outline-success my-2 my-sm-0" to="/search">Search</Link>
                     <button className="btn btn-outline-success my-2 my-sm-0" onClick={props.handleLogout}>Log out</button>
                 </div>
             }
