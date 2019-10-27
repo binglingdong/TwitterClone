@@ -8,7 +8,8 @@ router.post('/search', async function(req, res, next) {
     //Then check to see if any value is null, if it's set to default. 
     const unixTime = req.body.timestamp || parseInt((new Date().getTime() / 1000).toFixed(0));
     const limit = req.body.limit || 25;
-
+    
+    //
     //Check constraint.
     if(limit > 100 || limit <= 0){
         return res.json({
