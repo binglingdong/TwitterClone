@@ -38,40 +38,6 @@ router.post('/additem', async function(req, res, next) {
     });
 });
 
-router.post('/search', async function(req, res, next) {
-    //If the search request is sent from the front-end, it will arrived with modified time. 
-    //Then check to see if any value is null, if it's set to default. 
-    const unixTime = req.body.timestamp || parseInt((new Date().getTime() / 1000).toFixed(0));
-    const limit = req.body.limit || 25;
-
-    //Check constraint.
-    if(limit > 100 || limit <= 0){
-        return res.json({
-            status: "error",
-            error: "Limit out of range"
-        });
-    }
-    if(unixTime<=0){
-        return res.json({
-            status: "error",
-            error: "Invalid unix time"
-        });
-    }
-    
-    await Item.find({timestamp:{$lte: unixTime}}, async function (err, result) {
-        console.log(result);
-        if(err){
-            return res.json({
-                status: "error",
-                error: err
-            });
-        }
-        return res.json({
-            status: "OK",
-            items: result
-        });
-    }).limit(limit);
-});
 
 router.get('/item/:id', async function(req, res, next) {
     await Item.findOne({id:req.params.id}, async function (err, result) {

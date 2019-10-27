@@ -108,7 +108,8 @@ function App(props) {
         const res = await axios.post('/search', { 
             timestamp: unixTime,
             limit: parseInt(event.target.limitField.value),
-            q: event.target.searchByString
+            q: event.target.searchByString,
+            username:event.target.searchByUsername,
             //name: event.target.searchField.value
         });
         if(!res.data.error){
