@@ -7,8 +7,9 @@ import SignUpForm from './component/user/SignUpForm';
 import Verify from './component/user/Verify';
 import Home from './component/twitter/Home';
 import AddItem from './component/twitter/AddItem';
-import SearchResult from './component/twitter/SearchResult';
-import SearchItem from './component/twitter/SearchItem';
+import SearchResult from './component/search/SearchResult';
+import SearchItem from './component/search/SearchItem';
+import Search from'./component/search/Search';
 import { notification } from 'antd';
 
 function App(props) {
@@ -111,6 +112,7 @@ function App(props) {
         <div>
             <Navbar user = {user} handleLogout={handleLogout} handleSearch= {handleSearch}/>
             <Switch>
+                <Route exact path = "/search" render={() => (<Search/>)} />
                 <Route exact path="/" render={() => (<Home handleGetTwitter={handleGetTwitter}/>)} />
                 <Route exact path="/searchresult" render={() => (<SearchResult searchResult={searchResult} />)} />
                 <Route path="/item/:id" render={() => (<SearchItem item={item}/>)} />

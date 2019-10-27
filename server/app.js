@@ -12,6 +12,7 @@ const MongoStore = require('connect-mongo')(session);
 
 const userRouter = require('./routes/user');
 const itemRouter = require('./routes/item');
+const searchRouter = require('./routes/search');
 
 const app = express();
 
@@ -48,6 +49,7 @@ app.use(function(req, res, next) {
 //new item router
 app.use('/', itemRouter);
 app.use('/', userRouter);
+app.use('/', searchRouter);
 
 app.get("/*", function(req, res, next) {
   res.sendFile(path.join(__dirname, './public', 'index.html'));
