@@ -27,19 +27,29 @@ router.post('/search', async function(req, res, next) {
             error: "Invalid unix time"
         });
     }
-    const searchReg = ".*"+searchString.replace(" ", "|") +".*";
-    console.log(searchReg);
+    const searchReg = ".*"+searchString.replace(/ /g, "|") +".*";
+    //console.log(searchReg);
     const nameReg = ".*"+username+".*";
     let result = [];
     if(username==="" && searchString === ""){
         result = await Item.find({timestamp:{$lte: unixTime}});
     }else if(username === ""){
-        result = await Item.find( {$and: [{content: {$regex: searchReg, $options: 'i'}}, {timestamp:{$lte: unixTime}}]});
+        result = await Item.find( 
+                            {$and: [{content: {$regex: searchReg, $options: 'i'}},
+                            {timestamp:{$lte: unixTime}}]}
+                        );
     }else if(searchString === ""){
-        result = await Item.find( {$and:[{username: {$regex: nameReg, $options: 'i' }}, {timestamp:{$lte: unixTime}}]});
+        result = await Item.find( 
+                            {$and:[{username: {$regex: nameReg, $options: 'i' }}, 
+                            {timestamp:{$lte: unixTime}}]}
+                        );
     }
     else{
-        result = await Item.find( {$and: [{username: {$regex: nameReg, $options: 'i' }},{content: {$regex: searchReg, $options : 'i'}},{timestamp:{$lte: unixTime}}]});    
+        result = await Item.find(
+                            {$and: [{username: {$regex: nameReg, $options: 'i' }},
+                            {content: {$regex: searchReg, $options : 'i'}},
+                            {timestamp:{$lte: unixTime}}]}
+                        );    
     }
     //NOW result contains all the items that match the username and q. 
     //NEXT need to filter the following.
