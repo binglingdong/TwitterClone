@@ -40,7 +40,7 @@ router.post('/additem', async function(req, res, next) {
 
 router.get('/item/:id', async function(req, res, next) {
     await Item.findOne({id:req.params.id}, async function (err, result) {
-        if(err){
+        if(err || !result){
             return res.json({
                 status: "error",
                 error: err
@@ -54,11 +54,16 @@ router.get('/item/:id', async function(req, res, next) {
 });
 
 router.delete('/item/:id', async function(req, res, next) {
+    if(!req.user)
+        return res.status(404).end();
+    const item = await Item.findOne({id:req.params.id});
+    if(!item || item.username !== req.user.username)
+        return res.status(404).end();
     await Item.deleteOne({id:req.params.id}, async function (err, result) {
         if(err || result.deletedCount === 0){
-            res.status(404).end()
+            return res.status(404).end();
         }
-        res.status(200).end()
+        return res.status(200).end();
     });
 });
 

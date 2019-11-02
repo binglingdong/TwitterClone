@@ -136,13 +136,10 @@ router.get('/user/:username',  function(req, res, next) {
 });
 
 router.get('/user/:username/posts',  function(req, res, next) {
-    const limit = req.query.limit || 50;
+    let limit = req.query.limit || 50;
     //Check constraint limit.
-    if(limit > 200 || limit < 0){
-        return res.json({
-            status: "error",
-            error: "Limit out of range"
-        });
+    if(limit > 200){
+        limit = 200;
     }
     User.findOne({ 'username': req.params.username }, async function (err, user) {
         if(err || user == null){
@@ -169,12 +166,9 @@ router.get('/user/:username/posts',  function(req, res, next) {
 });
 
 router.get('/user/:username/following',  async function(req, res, next) {
-    const limit = req.query.limit || 50;
-    if(limit > 200 || limit < 0){
-        return res.json({
-            status: "error",
-            error: "Limit out of range"
-        });
+    let limit = req.query.limit || 50;
+    if(limit > 200){
+        limit = 200;
     }
     await User.findOne({username:req.params.username}, function (err, result) {
         if(err){
@@ -192,7 +186,10 @@ router.get('/user/:username/following',  async function(req, res, next) {
 });
 
 router.get('/user/:username/followers',  async function(req, res, next) {
-    const limit = req.query.limit || 50;
+    let limit = req.query.limit || 50;
+    if(limit > 200){
+        limit = 200;
+    }
     await User.findOne({username:req.params.username}, function (err, result) {
         if(err){
             return res.json({

@@ -15,11 +15,8 @@ router.post('/search', async function(req, res, next) {
     const username = req.body.username || "";
     const searchString = req.body.q || "";
     //Check constraint.
-    if(limit > 100 || limit <= 0){
-        return res.json({
-            status: "error",
-            error: "Limit out of range"
-        });
+    if(limit > 100){
+        limit = 200;
     }
     if(unixTime<=0){
         return res.json({
