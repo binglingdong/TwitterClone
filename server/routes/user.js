@@ -152,18 +152,18 @@ router.get('/user/:username/posts',  function(req, res, next) {
             });
         }
         else{
-            Item.find({username:user.username}, async function (err,items ) {
-                if(err){
-                    res.json({
-                        status: "error",
-                        error: err
-                    });
-                }
+            try { 
+                let itemIds = await Item.find({username:user.username}).distinct("id", {});
                 res.json({
                     status: "OK",
-                    items: items.slice(-limit).reverse()
+                    items: itemIds.slice(-limit).reverse()
                 });
-            });
+            } catch(err) {
+                res.json({
+                    status: "error",
+                    error: err
+                });
+            }
         }
     });
 });

@@ -12,6 +12,7 @@ import Search from'./component/search/Search';
 import Item from'./component/twitter/Item';
 import Following from'./component/user/Following';
 import Followers from'./component/user/Followers';
+import Posts from'./component/user/Posts';
 import { notification } from 'antd';
 import UserProfile from './component/user/UserProfile';
 
@@ -20,7 +21,6 @@ function App(props) {
     const [errorMessage, setErrorMessage] = useState(null);
     const [searchResult, setSearchResult] = useState([]);
     const [item, setItem] = useState(null);
-    const [userprofile, setUserProfile] = useState(null);
 
     useEffect(() => {
         async function fetchData() {
@@ -135,18 +135,6 @@ function App(props) {
         }
     }
 
-    async function handleUserProfile(event) {
-        event.preventDefault();
-        const res = await axios.get('/user/'+event.target.targetuser, { 
-
-        });
-        if(!res.data.error){
-            setUserProfile(res.data.user);
-        }  
-    }
-
-
-
     return (
         <div>
             <Navbar user = {user} handleLogout={handleLogout}/>
@@ -155,9 +143,10 @@ function App(props) {
                 <Route exact path = "/search" render={() => (<Search handleSearch= {handleSearch} handleGetTwitter={handleGetTwitter}/>)} />
                 <Route exact path="/searchresult" render={() => (<SearchResult searchResult={searchResult} />)} />
                 <Route exact path="/item/:id" render={() => (<Item item={item} handleDeleteTwitter={handleDeleteTwitter}/>)} />
-                <Route exact path="/user/:username" render={() => (<UserProfile item={item} handleUserProfile={handleUserProfile}/>)} />
-                <Route path="/user/:username/following" render={() => (<Following />)} />
-                <Route path="/user/:username/followers" render={() => (<Followers />)} />
+                <Route exact path="/user/:username" render={() => (<UserProfile />)} />
+                <Route exact path="/user/:username/following" render={() => (<Following />)} />
+                <Route exact path="/user/:username/followers" render={() => (<Followers />)} />
+                <Route exact path="/user/:username/posts" render={() => (<Posts />)} />
                 {!user && 
                     <React.Fragment>
                         <Route path="/verify" render={() => (<Verify handleVerifcation={handleVerifcation}/>)} />
@@ -167,7 +156,7 @@ function App(props) {
                 }
                 {user &&
                     <React.Fragment>
-                            <Route path="/additem" render={() => (<AddItem handleAddItem={handleAddItem}/>)} />
+                        <Route path="/additem" render={() => (<AddItem handleAddItem={handleAddItem}/>)} />
                     </React.Fragment>
                 }
                 <Route render={() => <NotFound message={"Not avaialbe or you have to log " + (user ? "out" : "in")} />}/>

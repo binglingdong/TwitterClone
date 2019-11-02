@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import UserList from './UserList';
 
-function Followers(props) {
-    const { username } = useParams();
+function Followers() {
+    const location = useLocation();
     const [followers, setFollowers] = useState([]);
 
     useEffect(() => {
         async function fetchData() {
-            const res = await axios.get('/user/'+username+"/followers");
+            const res = await axios.get(location.pathname + location.search);
             if(!res.data.error){
                 setFollowers(res.data.users);
             }  

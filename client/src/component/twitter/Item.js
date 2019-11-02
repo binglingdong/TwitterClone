@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import { Comment, Icon, Tooltip, Avatar } from 'antd';
+import {Link} from 'react-router-dom';
 
 function Item(props) {
     const [action, setAction] = useState(null);
@@ -23,45 +24,35 @@ function Item(props) {
     ] : null;
 
     return ( 
-            <div>
-                { !props.item &&
-                    <h1>Item not found.</h1>
-                }
-                { props.item &&
-                    <Comment
-                        actions={actions}
-                        author={<a>{props.item.username}</a>}
-                        avatar={
-                        <Avatar
-                            icon="user"
-                            alt={props.item.username}
-                        />
-                        }
-                        content={
+        <div>
+            { props.item &&
+                <Comment
+                    actions={actions}
+                    author={<Link to={"/user/"+props.item.username}>{props.item.username}</Link>}
+                    avatar={
+                    <Avatar
+                        icon="user"
+                        alt={props.item.username}
+                    />
+                    }
+                    content={
                         <p>
                             {props.item.content}
                         </p>
-                        }
-                        datetime={
-                            <React.Fragment>
-                                <Tooltip title={props.item.timestamp}>
-                                    <span>{props.item.timestamp}</span>
-                                </Tooltip>
-                                <Tooltip title={props.item.id}>
-                                    <span> ID: {props.item.id}</span>
-                                </Tooltip>
-                            </React.Fragment>
-                        }
-                        
-                    />
-                    
-                }
-                <form onSubmit={props.handleDeleteTwitter}>
-                    <input name="twitter_id" placeholder="Twitter ID" />
-                    <button type="submit">Delete</button>
-                </form>
-            </div>
-
+                    }
+                    datetime={
+                        <React.Fragment>
+                            <Tooltip title={props.item.timestamp}>
+                                <span>{props.item.timestamp}</span>
+                            </Tooltip>
+                            <Tooltip title={props.item.id}>
+                                <span> ID: {props.item.id}</span>
+                            </Tooltip>
+                        </React.Fragment>
+                    }
+                />
+            }
+        </div>
     );
 }
 
