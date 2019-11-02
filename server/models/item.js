@@ -16,5 +16,8 @@ const itemSchema = new Schema({
     },
     timestamp: Number,
 });
+let model = mongoose.model('Item', itemSchema);
 
-module.exports = mongoose.model('Item', itemSchema);
+
+   
+module.exports = model;
