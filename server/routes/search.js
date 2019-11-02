@@ -16,13 +16,13 @@ router.post('/search', async function(req, res, next) {
     const searchString = req.body.q || "";
     //Check constraint.
     if(limit > 100 || limit <= 0){
-        res.json({
+        return res.json({
             status: "error",
             error: "Limit out of range"
         });
     }
     if(unixTime<=0){
-        res.json({
+        return res.json({
             status: "error",
             error: "Invalid unix time"
         });
@@ -58,7 +58,7 @@ router.post('/search', async function(req, res, next) {
         const followings = user.following;
         result = result.filter(item => followings.includes(item.username));
     }
-    res.json({
+    return res.json({
         status: "OK",
         items: result.slice(-limit).reverse()
     });

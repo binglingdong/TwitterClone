@@ -8,7 +8,7 @@ const uuidv4 = require('uuid/v4');
 
 router.get('/user',  function(req, res, next) {
     const user = req.user ? req.user.username : null;
-    res.json({
+    return res.json({
         username: user
     });
 });
@@ -48,7 +48,7 @@ router.post('/adduser', async function(req, res, next) {
 
     await newUser.save();
 
-    res.json({
+    return res.json({
         status: "OK"
     });
 });
@@ -56,18 +56,18 @@ router.post('/adduser', async function(req, res, next) {
 router.post('/login', function(req, res, next) {
     passport.authenticate('local', function(err, user, info) {
         if (err || !user){ 
-            res.json({
+            return res.json({
                 status: "error",
                 error: info.message
             });
         }
         req.logIn(user, function(err) {
             if(err)
-                res.json({
+                return res.json({
                     status: "error",
                     error: err
                 });
-            res.json({
+            return res.json({
                 status: "OK",
                 username: req.user.username
             });
@@ -77,12 +77,12 @@ router.post('/login', function(req, res, next) {
 
 router.post('/logout', function(req, res, next) {
     if(!req.user) {
-        res.json({
+        return res.json({
             status: "error"
         });
     }
     req.logout();
-    res.json({
+    return res.json({
         status: "OK"
     });
 });
@@ -92,7 +92,7 @@ router.post('/verify',  function(req, res, next) {
     const key = req.body.key;
     User.findOne({ 'email': email }, async function (err, user) {
         if(err || user == null){
-            res.json({
+            return res.json({
                 status: "error",
                 error: err
             });
@@ -100,12 +100,12 @@ router.post('/verify',  function(req, res, next) {
         if(user.validKey(key) || key === 'abracadabra'){
             user.verified = true;
             await user.save();
-            res.json({
+            return res.json({
                 status: "OK"
             });
         }
         else {
-            res.json({
+            return res.json({
                 status: "error",
                 error: "Invalid Validation Key"
             });
@@ -116,13 +116,13 @@ router.post('/verify',  function(req, res, next) {
 router.get('/user/:username',  function(req, res, next) {
     User.findOne({ 'username': req.params.username }, async function (err, user) {
         if(err || user == null){
-            res.json({
+            return res.json({
                 status: "error",
                 error: err
             });
         }
         else{
-            res.json({
+            return res.json({
                 status: "OK",
                 user: {
                     username: user.username,
@@ -139,14 +139,14 @@ router.get('/user/:username/posts',  function(req, res, next) {
     const limit = req.query.limit || 50;
     //Check constraint limit.
     if(limit > 200 || limit < 0){
-        res.json({
+        return res.json({
             status: "error",
             error: "Limit out of range"
         });
     }
     User.findOne({ 'username': req.params.username }, async function (err, user) {
         if(err || user == null){
-            res.json({
+            return res.json({
                 status: "error",
                 error: err
             });
@@ -154,12 +154,12 @@ router.get('/user/:username/posts',  function(req, res, next) {
         else{
             try { 
                 let itemIds = await Item.find({username:user.username}).distinct("id", {});
-                res.json({
+                return res.json({
                     status: "OK",
                     items: itemIds.slice(-limit).reverse()
                 });
             } catch(err) {
-                res.json({
+                return res.json({
                     status: "error",
                     error: err
                 });
@@ -171,20 +171,20 @@ router.get('/user/:username/posts',  function(req, res, next) {
 router.get('/user/:username/following',  async function(req, res, next) {
     const limit = req.query.limit || 50;
     if(limit > 200 || limit < 0){
-        res.json({
+        return res.json({
             status: "error",
             error: "Limit out of range"
         });
     }
     await User.findOne({username:req.params.username}, function (err, result) {
         if(err){
-            res.json({
+            return res.json({
                 status: "error",
                 error: err
             });
         }
 
-        res.json({
+        return res.json({
             status: "OK",
             users: result.following.slice(-limit).reverse()
         });
@@ -195,12 +195,12 @@ router.get('/user/:username/followers',  async function(req, res, next) {
     const limit = req.query.limit || 50;
     await User.findOne({username:req.params.username}, function (err, result) {
         if(err){
-            res.json({
+            return res.json({
                 status: "error",
                 error: err
             });
         }
-        res.json({
+        return res.json({
             status: "OK",
             users: result.followers.slice(-limit).reverse()
         });
@@ -212,26 +212,26 @@ router.post('/follow',  async function(req, res, next) {
         const username = req.body.username;
         const follow = req.body.follow;
         if(username===req.user.username)//cannot follow urself
-            res.json({
+            return res.json({
                 status: "error",
                 error: "Can't follow yourself"
             });
         const user = await User.findOne({username:username});
         //cannot follow nonexist user
         if(!user) {
-            res.json({
+            return res.json({
                 status: "error",
                 error: "User doesn't exist"
             });
         }
         if(follow && req.user.following.includes(username)) {
-            res.json({
+            return res.json({
                 status: "error",
                 error: "User is already following"
             });
         }
         if(!follow && !req.user.following.includes(username)) {
-            res.json({
+            return res.json({
                 status: "error",
                 error: "User isn't following"
             });
@@ -240,7 +240,7 @@ router.post('/follow',  async function(req, res, next) {
         if(follow){
             await User.updateOne({username: req.user.username}, { $addToSet: { following: username } }, (err, result) => {
                 if(err) {
-                    res.json({
+                    return res.json({
                         status: "error",
                         error: err
                     });
@@ -248,20 +248,20 @@ router.post('/follow',  async function(req, res, next) {
             });
             await User.updateOne({username: username}, { $addToSet: { followers: req.user.username } }, (err, result) => {
                 if(err) {
-                    res.json({
+                    return res.json({
                         status: "error",
                         error: err
                     });
                 }
             });
-            res.json({
+            return res.json({
                 status: "OK"
             });
         }
         else{
             await User.updateOne({username: req.user.username}, { $pull: { following: username } }, (err, result) => {
                 if(err) {
-                    res.json({
+                    return res.json({
                         status: "error",
                         error: err
                     });
@@ -269,17 +269,17 @@ router.post('/follow',  async function(req, res, next) {
             });
             await User.updateOne({username: username}, { $pull: { followers: req.user.username } }, (err, result) => {
                 if(err) {
-                    res.json({
+                    return res.json({
                         status: "error"
                     });
                 }
             });
-            res.json({
+            return res.json({
                 status: "OK"
             });
         }
     }
-    res.json({
+    return res.json({
        status: "error",
        error: "You have to login"
     });

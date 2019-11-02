@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useParams, useLocation, Link } from "react-router-dom";
 
 function UserProfile() {
-    const {location} = useLocation();
+    const location = useLocation();
     const {username} = useParams();
     const [userprofile, setUserProfile] = useState(null);
 
@@ -12,7 +12,7 @@ function UserProfile() {
             const res = await axios.get(location.pathname);
             if(!res.data.error){
                 setUserProfile(res.data.user);
-            }  
+            }
         };
         fetchData();
     }, []);
