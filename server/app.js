@@ -46,14 +46,17 @@ app.use(function(req, res, next) {
     next();
 });
 
+app.get("/*", function(req, res, next) {
+    if(req.headers['user-agent'] != undefined && req.headers['requestfrom'] !== 'axios') {
+        return res.sendFile(path.join(__dirname, './public', 'index.html'));
+    }
+    next();
+});
+
 //new item router
 app.use('/', itemRouter);
 app.use('/', userRouter);
 app.use('/', searchRouter);
-
-app.get("/*", function(req, res, next) {
-    res.sendFile(path.join(__dirname, './public', 'index.html'));
-});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
