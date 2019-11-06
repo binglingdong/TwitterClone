@@ -28,7 +28,7 @@ function UserProfile(props) {
             }  
         };
         fetchData();
-    }, [location, update]);
+    }, [location, update, props.user, username]);
 
     async function handleFollow() {
         const res = await axios.post("/follow", {
@@ -89,7 +89,7 @@ function UserProfile(props) {
                         dataSource={posts}
                         renderItem={post => (
                         <List.Item>
-                            <PostItemId post={post} canDelete={username == props.user} handleDeleteTwitter={handleDeleteTwitter}/>
+                            <PostItemId post={post} canDelete={username === props.user} handleDeleteTwitter={handleDeleteTwitter}/>
                         </List.Item>
                         )}
                     />

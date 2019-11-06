@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { List } from 'antd';
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 
 function Posts() {
     const location = useLocation();
@@ -24,7 +24,7 @@ function Posts() {
                 dataSource={posts}
                 renderItem={post => (
                 <List.Item>
-                    {post}
+                    <Link to={"/item/"+post}>{post}</Link>
                 </List.Item>
                 )}
             />

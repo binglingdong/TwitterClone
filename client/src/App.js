@@ -9,11 +9,10 @@ import Home from './component/twitter/Home';
 import AddItem from './component/twitter/AddItem';
 import SearchResult from './component/search/SearchResult';
 import Search from'./component/search/Search';
-import Item from'./component/twitter/Item';
+import ItemById from'./component/twitter/ItemById';
 import Following from'./component/user/Following';
 import Followers from'./component/user/Followers';
 import Posts from'./component/user/Posts';
-import { notification } from 'antd';
 import UserProfile from './component/user/UserProfile';
 
 function App(props) {
@@ -21,7 +20,6 @@ function App(props) {
     const [user, setUser] = useState(null);
     const [errorMessage, setErrorMessage] = useState(null);
     const [searchResult, setSearchResult] = useState([]);
-    const [item, setItem] = useState(null);
 
     useEffect(() => {
         async function fetchData() {
@@ -51,10 +49,7 @@ function App(props) {
     
     async function handleGetTwitter(event){
         event.preventDefault();
-        const id = event.target.twitter_id.value;
-        const res = await axios.get('/item/' + id);
-        setItem(res.data.item);
-        history.push('/item/' + id);
+        history.push('/item/' + event.target.twitter_id.value);
     }
 
     async function handleSearch(event) {
@@ -86,7 +81,7 @@ function App(props) {
                     <Route exact path="/" render={() => (<Home/>)} />
                     <Route exact path = "/search" render={() => (<Search handleSearch= {handleSearch} handleGetTwitter={handleGetTwitter}/>)} />
                     <Route exact path="/searchresult" render={() => (<SearchResult searchResult={searchResult} />)} />
-                    <Route exact path="/item/:id" render={() => (<Item item={item} />)} />
+                    <Route exact path="/item/:id" render={() => (<ItemById />)} />
                     <Route exact path="/user/:username" render={() => (<UserProfile user={user}/>)} />
                     <Route exact path="/user/:username/following" render={() => (<Following />)} />
                     <Route exact path="/user/:username/followers" render={() => (<Followers />)} />
