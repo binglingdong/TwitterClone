@@ -3,7 +3,7 @@ import axios from 'axios';
 import { List } from 'antd';
 import { useLocation } from "react-router-dom";
 
-function Followers() {
+function Posts() {
     const location = useLocation();
     const [posts, setPosts] = useState([]);
 
@@ -15,7 +15,7 @@ function Followers() {
             }  
         };
         fetchData();
-    }, []);
+    }, [location]);
     return (
         <div>
             <h1>Posts</h1>
@@ -32,4 +32,4 @@ function Followers() {
     );
 }
 
-export default Followers;
+export default Posts;

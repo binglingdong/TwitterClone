@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Route, Switch, withRouter} from "react-router-dom";
+import { Route, Switch, useHistory } from "react-router-dom";
 import axios from 'axios';
 import Navbar from './component/layout/Navbar';
 import LoginForm from './component/user/LoginForm';
@@ -17,6 +17,7 @@ import { notification } from 'antd';
 import UserProfile from './component/user/UserProfile';
 
 function App(props) {
+    let history = useHistory();
     const [user, setUser] = useState(null);
     const [errorMessage, setErrorMessage] = useState(null);
     const [searchResult, setSearchResult] = useState([]);
@@ -39,48 +40,13 @@ function App(props) {
         setUser(res.data.username);
         setErrorMessage(res.data.error);
         if(!res.data.error)
-            props.history.push('/');
+            history.push('/');
     }
 
     async function handleLogout(event) {
         await axios.post('/logout');
         setUser(null);
-        props.history.push('/');
-    }
-    
-    async function handleSignUp(event){
-        event.preventDefault();
-        await axios.post('/adduser', {
-            username: event.target.username.value,
-            password: event.target.password.value,
-            email: event.target.email.value,
-        });
-        props.history.push('/verify');
-    }
-
-    async function handleVerifcation(event){
-        event.preventDefault();
-        await axios.post('/verify', {
-            email: event.target.email.value,
-            key: event.target.verifyCode.value,
-        });
-        props.history.push('/');
-    }
-
-    // add item function 
-    async function handleAddItem(event){
-        event.preventDefault();
-        const res = await axios.post('/additem', {
-            content: event.target.content.value,
-            childType: null// may need a function to check childtype
-        });
-        notification['success']({
-            message: 'Tweet successfully added',
-            description:
-              'Id: ' + res.data.id,
-            duration: 0,
-        });
-        props.history.push('/');
+        history.push('/');
     }
     
     async function handleGetTwitter(event){
@@ -88,30 +54,7 @@ function App(props) {
         const id = event.target.twitter_id.value;
         const res = await axios.get('/item/' + id);
         setItem(res.data.item);
-        props.history.push('/item/' + id);
-    }
-
-    async function handleDeleteTwitter(event){
-        event.preventDefault();
-        const id = event.target.twitter_id.value;
-        axios.delete('/item/' + id)
-            .then(res=>{
-                notification['success']({
-                    message: 'Tweet successfully deleted',
-                    description:
-                    'Id: ' + id,
-                    duration: 0,
-                });
-            })
-            .catch(function(err) {
-                notification['error']({
-                    message: 'Failed to delete Tweet',
-                    description:
-                    'Id: ' + id,
-                    duration: 0,
-                });
-            });
-        //props.history.push('/');
+        history.push('/item/' + id);
     }
 
     async function handleSearch(event) {
@@ -131,36 +74,38 @@ function App(props) {
         });
         if(!res.data.error){
             setSearchResult(res.data.items);
-            props.history.push('/searchresult');
+            history.push('/searchresult');
         }
     }
 
     return (
         <div>
             <Navbar user = {user} handleLogout={handleLogout}/>
-            <Switch>
-                <Route exact path="/" render={() => (<Home/>)} />
-                <Route exact path = "/search" render={() => (<Search handleSearch= {handleSearch} handleGetTwitter={handleGetTwitter}/>)} />
-                <Route exact path="/searchresult" render={() => (<SearchResult searchResult={searchResult} />)} />
-                <Route exact path="/item/:id" render={() => (<Item item={item} handleDeleteTwitter={handleDeleteTwitter}/>)} />
-                <Route exact path="/user/:username" render={() => (<UserProfile />)} />
-                <Route exact path="/user/:username/following" render={() => (<Following />)} />
-                <Route exact path="/user/:username/followers" render={() => (<Followers />)} />
-                <Route exact path="/user/:username/posts" render={() => (<Posts />)} />
-                {!user && 
-                    <React.Fragment>
-                        <Route path="/verify" render={() => (<Verify handleVerifcation={handleVerifcation}/>)} />
-                        <Route path="/adduser" render={() => (<SignUpForm handleSignUp={handleSignUp}/>)} />
-                        <Route path="/signin" render={() => (<LoginForm handleLogin={handleLogin} errorMessage={errorMessage}/>)}/> 
-                    </React.Fragment>
-                }
-                {user &&
-                    <React.Fragment>
-                        <Route path="/additem" render={() => (<AddItem handleAddItem={handleAddItem}/>)} />
-                    </React.Fragment>
-                }
-                <Route render={() => <NotFound message={"Not avaialbe or you have to log " + (user ? "out" : "in")} />}/>
-            </Switch>
+            <div className="container">
+                <Switch>
+                    <Route exact path="/" render={() => (<Home/>)} />
+                    <Route exact path = "/search" render={() => (<Search handleSearch= {handleSearch} handleGetTwitter={handleGetTwitter}/>)} />
+                    <Route exact path="/searchresult" render={() => (<SearchResult searchResult={searchResult} />)} />
+                    <Route exact path="/item/:id" render={() => (<Item item={item} />)} />
+                    <Route exact path="/user/:username" render={() => (<UserProfile user={user}/>)} />
+                    <Route exact path="/user/:username/following" render={() => (<Following />)} />
+                    <Route exact path="/user/:username/followers" render={() => (<Followers />)} />
+                    <Route exact path="/user/:username/posts" render={() => (<Posts />)} />
+                    {!user && 
+                        <React.Fragment>
+                            <Route path="/verify" render={() => (<Verify />)} />
+                            <Route path="/adduser" render={() => (<SignUpForm />)} />
+                            <Route path="/signin" render={() => (<LoginForm handleLogin={handleLogin} errorMessage={errorMessage}/>)}/> 
+                        </React.Fragment>
+                    }
+                    {user &&
+                        <React.Fragment>
+                            <Route path="/additem" render={() => (<AddItem />)} />
+                        </React.Fragment>
+                    }
+                    <Route render={() => <NotFound message={"Not avaialbe or you have to log " + (user ? "out" : "in")} />}/>
+                </Switch>
+            </div>
         </div>
     )
 }
@@ -171,4 +116,4 @@ function NotFound(props) {
     )
 }
 
-export default withRouter(App);
+export default App;

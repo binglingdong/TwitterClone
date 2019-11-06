@@ -15,7 +15,7 @@ function Following() {
             }  
         };
         fetchData();
-    }, []);
+    }, [location]);
     return (
         <div>
             <h1>Following</h1>

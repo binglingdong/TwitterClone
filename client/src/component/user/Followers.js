@@ -15,7 +15,8 @@ function Followers() {
             }  
         };
         fetchData();
-    }, []);
+    }, [location]);
+
     return (
         <div>
             <h1>Followers</h1>

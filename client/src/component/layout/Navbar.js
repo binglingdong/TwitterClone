@@ -12,6 +12,7 @@ function Navbar (props){
             {props.user &&
                 <React.Fragment>
                     <Link className="btn btn-outline-success my-2 my-sm-0" to="/additem">Add Item</Link>
+                    <Link className="btn btn-outline-success my-2 my-sm-0" to={"/user/"+props.user}>Profile</Link>
                     <button className="btn btn-outline-success my-2 my-sm-0" onClick={props.handleLogout}>Log out</button>
                 </React.Fragment>
             }

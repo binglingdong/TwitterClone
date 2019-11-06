@@ -165,6 +165,21 @@ router.get('/user/:username/posts',  function(req, res, next) {
     });
 });
 
+router.post('/user/following',  async function(req, res, next) {
+    await User.findOne({username:req.user.username}, function (err, result) {
+        if(err){
+            return res.json({
+                status: "error",
+                error: err
+            });
+        }
+        return res.json({
+            status: "OK",
+            following: result.following.includes(req.body.username)
+        });
+    });
+});
+
 router.get('/user/:username/following',  async function(req, res, next) {
     let limit = req.query.limit || 50;
     if(limit > 200){

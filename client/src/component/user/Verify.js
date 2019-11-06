@@ -1,10 +1,23 @@
 import React from 'react';
+import axios from 'axios';
+import { useHistory } from 'react-router-dom';
 
-function Verify(props) {
+function Verify() {
+    let history = useHistory();
+
+    async function handleVerifcation(event){
+        event.preventDefault();
+        await axios.post('/verify', {
+            email: event.target.email.value,
+            key: event.target.verifyCode.value,
+        });
+        history.push('/');
+    }
+
     return (
         <div>
         <h5 className="card-title text-color-1 pb-4 font-weight-bold">Verify</h5>
-                <form className="form-signin" onSubmit={props.handleVerifcation}>
+                <form className="form-signin" onSubmit={handleVerifcation}>
                     <div className="form-group row">
                             <label htmlFor="email" className="col-sm-3 col-form-label">Email:</label>
                             <div className="col-sm-7">
