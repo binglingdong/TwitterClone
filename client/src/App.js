@@ -46,11 +46,6 @@ function App(props) {
         setUser(null);
         history.push('/');
     }
-    
-    async function handleGetTwitter(event){
-        event.preventDefault();
-        history.push('/item/' + event.target.twitter_id.value);
-    }
 
     async function handleSearch(event) {
         event.preventDefault();
@@ -79,7 +74,7 @@ function App(props) {
             <div className="container">
                 <Switch>
                     <Route exact path="/" render={() => (<Home/>)} />
-                    <Route exact path = "/search" render={() => (<Search handleSearch= {handleSearch} handleGetTwitter={handleGetTwitter}/>)} />
+                    <Route exact path = "/search" render={() => (<Search handleSearch= {handleSearch} />)} />
                     <Route exact path="/searchresult" render={() => (<SearchResult searchResult={searchResult} />)} />
                     <Route exact path="/item/:id" render={() => (<ItemById />)} />
                     <Route exact path="/user/:username" render={() => (<UserProfile user={user}/>)} />
