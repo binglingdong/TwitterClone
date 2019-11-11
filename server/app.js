@@ -9,6 +9,7 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const mongoose = require('mongoose');
 const MongoStore = require('connect-mongo')(session);
+const Memcached = require('memcached');
 
 const userRouter = require('./routes/user');
 const itemRouter = require('./routes/item');
@@ -23,6 +24,8 @@ mongoose.connect('mongodb://localhost:27017/twitter', {
     useFindAndModify: false
 });
 require('./config/passport');
+
+const memcached = new Memcached('localhost:11211');
 
 app.use(cors());
 app.use(logger('dev'));
@@ -51,6 +54,24 @@ app.get("/*", function(req, res, next) {
         return res.sendFile(path.join(__dirname, './public', 'index.html'));
     }
     next();
+});
+
+app.get("/*", async function(req, res, next) {
+    const key = req.url;
+    memcached.get(key, function (err, data) {
+        if(err || !data) {
+            const json = res.json;
+            res.json = async function(body) {
+                memcached.set(key, body, 10, function(err) {});
+                json.call(this, body);
+            }
+            next();
+        }
+        else {
+            res.json(data);
+            return;
+        }
+    });
 });
 
 //new item router
