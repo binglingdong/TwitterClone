@@ -1,15 +1,25 @@
-import React, {useState} from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Comment, Icon, Tooltip, Avatar, List, Typography } from 'antd';
 import {Link} from 'react-router-dom';
 import AddItem from './AddItem';
 
 function Item(props) {
-    const [action, setAction] = useState(null);
+    const [liked, setLiked] = useState(null);
     const [reply, setReply] = useState(false);
     const [childType, setChildType] = useState(null);
 
-    function like() {
-        setAction("liked");
+    useEffect(() => {
+        async function fetchData() {
+            const res = await axios.get('/item/' + props.item.id + '/like');
+            setLiked(res.data.liked);
+        };
+        fetchData();
+    }, [props.item.id]);
+
+    async function like() {
+        await axios.post('/item/' + props.item.id + '/like', {like: !liked});
+        setLiked(!liked);
     };
 
     function toggleReply(open, type) {
@@ -22,11 +32,11 @@ function Item(props) {
             <Tooltip title="Like">
                 <Icon
                 type="like"
-                theme={action === 'liked' ? 'filled' : 'outlined'}
+                theme={liked ? 'filled' : 'outlined'}
                 onClick={like}
                 />
             </Tooltip>
-            <span style={{ paddingLeft: 8, cursor: 'auto' }}>{props.item.property.likes}</span>
+            <span style={{ paddingLeft: 8, cursor: 'auto' }}>{props.item.property.likes + liked ? 1 : 0}</span>
         </span>,
         <span key="comment-basic-reply-to" onClick={() => toggleReply(true, 'retweet')}>Retweet({props.item.retweeted})</span>,
         <span key="comment-basic-reply-to" onClick={() => toggleReply(true, 'reply')}>Reply to</span>,

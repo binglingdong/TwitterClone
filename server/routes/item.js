@@ -88,6 +88,36 @@ router.delete('/item/:id', async function(req, res, next) {
     });
 });
 
+router.post('/item/:id/like', async function(req, res, next) {
+    if(req.body.like) {
+        let item = await Item.findOne({ id: req.params.id });
+        item.property.likes += 1;
+        item.likedBy.push(req.user.username);
+        await item.save();
+    }
+    else {
+        let item = await Item.findOne({ id: req.params.id });
+        item.property.likes -= 1;
+        item.likedBy = item.likedBy.filter(item => item !== req.user.username);
+        await item.save();    
+    }
+    return res.json({
+        status: 'OK'
+    });
+});
+
+router.get('/item/:id/like', async function(req, res, next) {
+    if(!req.user) {
+        return res.json({
+            liked: false
+        });
+    }
+    let item = await Item.findOne({ id: req.params.id });
+    return res.json({
+        liked: item.likedBy.includes(req.user.username)
+    });
+});
+
 router.post('/addmedia', upload.single('media'), async function(req, res, next) {
     if(!req.user) {
         return res.json({

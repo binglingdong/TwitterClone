@@ -15,6 +15,7 @@ const itemSchema = new Schema({
     property:{
         likes: Number,
     },
+    likedBy: [String],
     timestamp: Number,
     media: [String]
 });
