@@ -10,6 +10,7 @@ import AddItem from './component/twitter/AddItem';
 import SearchResult from './component/search/SearchResult';
 import Search from'./component/search/Search';
 import ItemById from'./component/twitter/ItemById';
+import Media from'./component/twitter/Media';
 import Following from'./component/user/Following';
 import Followers from'./component/user/Followers';
 import Posts from'./component/user/Posts';
@@ -77,6 +78,7 @@ function App(props) {
                     <Route exact path = "/search" render={() => (<Search handleSearch= {handleSearch} />)} />
                     <Route exact path="/searchresult" render={() => (<SearchResult searchResult={searchResult} />)} />
                     <Route exact path="/item/:id" render={() => (<ItemById />)} />
+                    <Route exact path="/media/:id" render={() => (<Media />)} />
                     <Route exact path="/user/:username" render={() => (<UserProfile user={user}/>)} />
                     <Route exact path="/user/:username/following" render={() => (<Following />)} />
                     <Route exact path="/user/:username/followers" render={() => (<Followers />)} />

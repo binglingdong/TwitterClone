@@ -166,17 +166,9 @@ router.get('/user/:username/posts',  function(req, res, next) {
 });
 
 router.post('/user/following',  async function(req, res, next) {
-    await User.findOne({username:req.user.username}, function (err, result) {
-        if(err){
-            return res.json({
-                status: "error",
-                error: err
-            });
-        }
-        return res.json({
-            status: "OK",
-            following: result.following.includes(req.body.username)
-        });
+    return res.json({
+        status: "OK",
+        following: req.user.following.includes(req.body.username)
     });
 });
 

@@ -14,6 +14,11 @@ function Search(props) {
         history.push('/user/' + event.target.user_id.value);
     }
 
+    async function handleGetMedia(event){
+        event.preventDefault();
+        history.push('/media/' + event.target.media_id.value);
+    }
+
     function toDateInputValue() {
         const local = new Date();
         return local.toJSON().slice(0,10);
@@ -28,6 +33,11 @@ function Search(props) {
         <br />
         <form onSubmit={handleGetUser}>
                         <input name="user_id" placeholder="User ID" />
+                        <button type="submit">Find</button>
+                    </form>
+        <br />
+        <form onSubmit={handleGetMedia}>
+                        <input name="media_id" placeholder="Media ID" />
                         <button type="submit">Find</button>
                     </form>
         <br />

@@ -1,15 +1,38 @@
-import React from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
-import { notification } from 'antd';
+import { notification, Upload, Button, Icon  } from 'antd';
 
 function AddItem() {
     let history = useHistory();
+    const [files, setFiles] = useState([]);
+    const media = {
+        name: 'media',
+        action: '/addmedia',
+        showUploadList: {showDownloadIcon: false},
+        onChange(info) {
+            if (info.file.status === 'done') {
+                notification['success']({
+                    message: info.file.name + 'file uploaded successfully',
+                    description:
+                      'Id: ' + info.file.response.id,
+                    duration: 0,
+                });
+                setFiles([...files, info.file.response.id]);
+            } else if (info.file.status === 'error') {
+                notification['error']({
+                    message: info.file.name + 'file upload failed',
+                    duration: 0,
+                });
+            }
+        }
+    };
 
     async function handleAddItem(event){
         event.preventDefault();
         const res = await axios.post('/additem', {
             content: event.target.content.value,
+            media: files,
             childType: null// may need a function to check childtype
         });
         notification['success']({
@@ -25,11 +48,17 @@ function AddItem() {
             <div>
                 <form className="form-signin" onSubmit={handleAddItem}>
                         <div className="form-group row">
-                            <label htmlFor="content" className="col-sm-3 col-form-label">Hello</label>
+                            <label htmlFor="content" className="col-sm-3 col-form-label">Tweet</label>
                             <div className="col-sm-7">
-                                <textarea rows="4" cols="50" name="content"> </textarea>
+                                <textarea rows="4" cols="50" name="content" required></textarea>
                             </div>
                         </div>
+                        <Upload {...media}>
+                            <Button>
+                                <Icon type="upload" /> Click to Upload
+                            </Button>
+                        </Upload>
+                        <p>Hover over file to delete</p>
                         <button className="btn btn-outline-dark text-uppercase mt-4" type="submit">Tweet</button>
                 </form>
             </div>

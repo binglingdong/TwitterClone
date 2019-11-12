@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { Comment, Icon, Tooltip, Avatar } from 'antd';
+import { Comment, Icon, Tooltip, Avatar, List, Typography } from 'antd';
 import {Link} from 'react-router-dom';
 
 function Item(props) {
@@ -36,17 +36,28 @@ function Item(props) {
                     />
                     }
                     content={
-                        <p>
-                            {props.item.content}
-                        </p>
+                        <React.Fragment>
+                            <p>
+                                {props.item.content}
+                            </p>
+                            { !(props.item.media.length === 0) &&
+                                <List
+                                    bordered
+                                    dataSource={props.item.media}
+                                    renderItem={item => (
+                                        <List.Item>
+                                            <Typography.Text mark>[MEDIA]</Typography.Text>
+                                            <Link to={"/media/" + item}>{item}</Link>
+                                        </List.Item>
+                                    )}
+                                />
+                            }
+                        </React.Fragment>
                     }
                     datetime={
                         <React.Fragment>
                             <Tooltip title={props.item.timestamp}>
                                 <span>{props.item.timestamp}</span>
-                            </Tooltip>
-                            <Tooltip title={props.item.id}>
-                                <span> ID: {props.item.id}</span>
                             </Tooltip>
                         </React.Fragment>
                     }
