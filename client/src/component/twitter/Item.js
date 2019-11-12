@@ -1,12 +1,20 @@
 import React, {useState} from 'react';
 import { Comment, Icon, Tooltip, Avatar, List, Typography } from 'antd';
 import {Link} from 'react-router-dom';
+import AddItem from './AddItem';
 
 function Item(props) {
     const [action, setAction] = useState(null);
+    const [reply, setReply] = useState(false);
+    const [childType, setChildType] = useState(null);
 
     function like() {
         setAction("liked");
+    };
+
+    function toggleReply(open, type) {
+        setReply(open);
+        setChildType(type);
     };
 
     const actions = props.item ? [
@@ -20,7 +28,8 @@ function Item(props) {
             </Tooltip>
             <span style={{ paddingLeft: 8, cursor: 'auto' }}>{props.item.property.likes}</span>
         </span>,
-        <span key="comment-basic-reply-to">Reply to</span>,
+        <span key="comment-basic-reply-to" onClick={() => toggleReply(true, 'retweet')}>Retweet({props.item.retweeted})</span>,
+        <span key="comment-basic-reply-to" onClick={() => toggleReply(true, 'reply')}>Reply to</span>,
     ] : null;
 
     return ( 
@@ -37,6 +46,11 @@ function Item(props) {
                     }
                     content={
                         <React.Fragment>
+                            { props.item.parent && 
+                                <Typography.Text strong>
+                                    {props.item.childType} of <Link to={'/item/' + props.item.parent}>{props.item.parent}</Link>
+                                </Typography.Text> 
+                            }
                             <p>
                                 {props.item.content}
                             </p>
@@ -62,6 +76,12 @@ function Item(props) {
                         </React.Fragment>
                     }
                 />
+            }
+            { reply && 
+                <React.Fragment>
+                    <AddItem parent={props.item.id} childType={childType}/> 
+                    <button className="btn btn-outline-dark text-uppercase mt-4" onClick={() => toggleReply(false, null)}>Cancel</button>
+                </React.Fragment>
             }
         </div>
     );

@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 import { notification, Upload, Button, Icon  } from 'antd';
 
-function AddItem() {
+function AddItem(props) {
     let history = useHistory();
     const [files, setFiles] = useState([]);
     const media = {
@@ -32,8 +32,9 @@ function AddItem() {
         event.preventDefault();
         const res = await axios.post('/additem', {
             content: event.target.content.value,
+            parent: props.parent,
             media: files,
-            childType: null// may need a function to check childtype
+            childType: props.childType || null
         });
         notification['success']({
             message: 'Tweet successfully added',
@@ -62,7 +63,6 @@ function AddItem() {
                         <button className="btn btn-outline-dark text-uppercase mt-4" type="submit">Tweet</button>
                 </form>
             </div>
-
     );
 }
 

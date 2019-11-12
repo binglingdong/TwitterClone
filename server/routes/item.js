@@ -42,10 +42,12 @@ router.post('/additem', async function(req, res, next) {
         media: req.body.media
     });
     await newitem.save();
-    return res.json({
+    res.json({
         status: "OK",
         id : id
     });
+    if (req.body.childType === 'retweet')
+        Item.findOneAndUpdate({ id: req.body.parent }, { $inc: { retweeted: 1 } }, function(err) {});
 });
 
 router.get('/item/:id', async function(req, res, next) {
