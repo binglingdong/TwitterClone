@@ -9,7 +9,7 @@ function AddItem(props) {
     const media = {
         name: 'media',
         action: '/addmedia',
-        showUploadList: {showDownloadIcon: false},
+        showUploadList: {showDownloadIcon: false, showRemoveIcon: false},
         onChange(info) {
             if (info.file.status === 'done') {
                 notification['success']({
@@ -59,7 +59,6 @@ function AddItem(props) {
                                 <Icon type="upload" /> Click to Upload
                             </Button>
                         </Upload>
-                        <p>Hover over file to delete</p>
                         <button className="btn btn-outline-dark text-uppercase mt-4" type="submit">Tweet</button>
                 </form>
             </div>
