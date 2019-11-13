@@ -11,6 +11,9 @@ const mongoose = require('mongoose');
 const MongoStore = require('connect-mongo')(session);
 const Memcached = require('memcached');
 
+const cluster = require('cluster');
+const numCPUs = require('os').cpus().length;
+
 const userRouter = require('./routes/user');
 const itemRouter = require('./routes/item');
 const searchRouter = require('./routes/search');
@@ -99,6 +102,21 @@ app.use(function(err, req, res, next) {
     });
 });
 
-app.listen(3000, () => console.log('Server running on port 3000'));
+if (cluster.isMaster) {
+    console.log(`Master ${process.pid} is running`);
+
+    for (let i = 0; i < numCPUs; i++) {
+        cluster.fork();
+    }
+
+    cluster.on('exit', (worker, code, signal) => {
+        console.log(`worker ${worker.process.pid} died`);
+    });
+    } else {
+
+    app.listen(3000, () => console.log('Server running on port 3000'));
+
+    console.log(`Worker ${process.pid} started`);
+}
 
 module.exports = app;
