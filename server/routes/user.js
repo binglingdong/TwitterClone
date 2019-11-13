@@ -135,22 +135,22 @@ router.get('/user/:username',  function(req, res, next) {
     });
 });
 
-router.get('/user/:username/posts',  function(req, res, next) {
+router.get('/user/:username/posts', async function(req, res, next) {
     let limit = req.query.limit || 50;
     //Check constraint limit.
     if(limit > 200){
         limit = 200;
     }
-    User.findOne({ 'username': req.params.username }, async function (err, user) {
-        if(err || user == null){
-            return res.json({
-                status: "error",
-                error: err
-            });
-        }
-        else{
+    // User.findOne({ 'username': req.params.username }, async function (err, user) {
+    //     if(err || user == null){
+    //         return res.json({
+    //             status: "error",
+    //             error: err
+    //         });
+    //     }
+    //     else{
             try { 
-                let itemIds = await Item.find({username:user.username}).distinct("id", {});
+                let itemIds = await Item.find({username:req.params.username}).distinct("id", {});
                 return res.json({
                     status: "OK",
                     items: itemIds.slice(-limit).reverse()
@@ -161,8 +161,8 @@ router.get('/user/:username/posts',  function(req, res, next) {
                     error: err
                 });
             }
-        }
-    });
+    //     }
+    // });
 });
 
 router.post('/user/following',  async function(req, res, next) {

@@ -48,34 +48,29 @@ app.use(passport.session());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'uploads')));
 
-app.use(function(req, res, next) {
-    res.locals.login = req.isAuthenticated();
-    next();
-});
-
-app.get("/*", function(req, res, next) {
-    if(req.headers['user-agent'] != undefined && req.headers['requestfrom'] !== 'axios') {
-        return res.sendFile(path.join(__dirname, './public', 'index.html'));
-    }
-    next();
-});
+// app.get("/*", function(req, res, next) {
+//     if(req.headers['user-agent'] != undefined && req.headers['requestfrom'] !== 'axios') {
+//         return res.sendFile(path.join(__dirname, './public', 'index.html'));
+//     }
+//     next();
+// });
 
 app.get("/*", async function(req, res, next) {
     const key = req.url;
-    memcached.get(key, function (err, data) {
-        if(err || !data) {
+    // memcached.get(key, function (err, data) {
+    //     if(err || !data) {
             const json = res.json;
             res.json = async function(body) {
-                memcached.set(key, body, 10, function(err) {});
                 json.call(this, body);
+                memcached.set(key, body, 30, function(err) {});
             }
             next();
-        }
-        else {
-            res.json(data);
-            return;
-        }
-    });
+        // }
+        // else {
+        //     res.json(data);
+        //     return;
+        // }
+    // });
 });
 
 //new item router
