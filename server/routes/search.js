@@ -7,7 +7,7 @@ router.post('/search', async function(req, res, next) {
     //If the search request is sent from the front-end, it will arrived with modified time. 
     //Then check to see if any value is null, if it's set to default. 
     const unixTime = req.body.timestamp || parseInt((new Date().getTime() / 1000).toFixed(0));
-    const limit = parseInt(req.body.limit) || 25;
+    const limit = req.body.limit || 25;
     if (limit > 100){
         limit = 100;
     }
