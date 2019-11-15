@@ -64,7 +64,7 @@ function Item(props) {
                             <p>
                                 {props.item.content}
                             </p>
-                            { !(props.item.media.length === 0) &&
+                            { (props.item.media && !(props.item.media.length === 0)) &&
                                 <List
                                     bordered
                                     dataSource={props.item.media}

@@ -113,24 +113,21 @@ router.post('/verify',  function(req, res, next) {
     });
 });
 
-router.get('/user/:username',  function(req, res, next) {
-    User.findOne({ 'username': req.params.username }, async function (err, user) {
-        if(err || user == null){
-            return res.json({
-                status: "error",
-                error: err
-            });
-        }
-        else{
-            return res.json({
-                status: "OK",
-                user: {
-                    username: user.username,
-                    email : user.email,
-                    followers : user.followers.length,
-                    following : user.following.length
-                }
-            });
+router.get('/user/:username',  async function(req, res, next) {
+    let user = await User.findOne({ 'username': req.params.username }).select('username email followers following').lean();
+    if(user == null){
+        return res.json({
+            status: "error",
+            error: "User doesn't exist"
+        });
+    }
+    return res.json({
+        status: "OK",
+        user: {
+            username: user.username,
+            email : user.email,
+            followers : user.followers ? user.followers.length : 0,
+            following : user.following ? user.following.length : 0
         }
     });
 });
@@ -150,10 +147,11 @@ router.get('/user/:username/posts', async function(req, res, next) {
     //     }
     //     else{
             try { 
-                let itemIds = await Item.find({username:req.params.username}).distinct("id", {});
+                let itemIds = await Item.find({username:req.params.username}).sort({timestamp:-1}).select('id').limit(limit).lean();
+                itemIds = itemIds.map(i => i.id);
                 return res.json({
                     status: "OK",
-                    items: itemIds.slice(-limit).reverse()
+                    items: itemIds
                 });
             } catch(err) {
                 return res.json({
@@ -177,18 +175,11 @@ router.get('/user/:username/following',  async function(req, res, next) {
     if(limit > 200){
         limit = 200;
     }
-    await User.findOne({username:req.params.username}, function (err, result) {
-        if(err){
-            return res.json({
-                status: "error",
-                error: err
-            });
-        }
+    let user = await User.findOne({username:req.params.username}).select('following').lean();
 
-        return res.json({
-            status: "OK",
-            users: result.following.slice(-limit).reverse()
-        });
+    return res.json({
+        status: "OK",
+        users: user.following ? user.following.slice(-limit).reverse() : []
     });
 });
 
@@ -197,17 +188,11 @@ router.get('/user/:username/followers',  async function(req, res, next) {
     if(limit > 200){
         limit = 200;
     }
-    await User.findOne({username:req.params.username}, function (err, result) {
-        if(err){
-            return res.json({
-                status: "error",
-                error: err
-            });
-        }
-        return res.json({
-            status: "OK",
-            users: result.followers.slice(-limit).reverse()
-        });
+    let user = await User.findOne({username:req.params.username}).select('followers').lean();
+
+    return res.json({
+        status: "OK",
+        users: user.followers ? user.followers.slice(-limit).reverse() : []
     });
 });
 
@@ -220,7 +205,7 @@ router.post('/follow',  async function(req, res, next) {
                 status: "error",
                 error: "Can't follow yourself"
             });
-        const user = await User.findOne({username:username});
+        const user = await User.findOne({username:username}).select('username').lean();
         //cannot follow nonexist user
         if(!user) {
             return res.json({
@@ -242,42 +227,19 @@ router.post('/follow',  async function(req, res, next) {
         }
 
         if(follow){
-            await User.updateOne({username: req.user.username}, { $addToSet: { following: username } }, (err, result) => {
-                if(err) {
-                    return res.json({
-                        status: "error",
-                        error: err
-                    });
-                }
-            });
-            await User.updateOne({username: username}, { $addToSet: { followers: req.user.username } }, (err, result) => {
-                if(err) {
-                    return res.json({
-                        status: "error",
-                        error: err
-                    });
-                }
-            });
+            await Promise.all([
+                User.updateOne({username: req.user.username}, { $addToSet: { following: username }}),
+                User.updateOne({username: username}, { $addToSet: { followers: req.user.username }})
+            ]);
             return res.json({
                 status: "OK"
             });
         }
         else{
-            await User.updateOne({username: req.user.username}, { $pull: { following: username } }, (err, result) => {
-                if(err) {
-                    return res.json({
-                        status: "error",
-                        error: err
-                    });
-                }
-            });
-            await User.updateOne({username: username}, { $pull: { followers: req.user.username } }, (err, result) => {
-                if(err) {
-                    return res.json({
-                        status: "error"
-                    });
-                }
-            });
+            await Promise.all([
+                User.updateOne({username: req.user.username}, { $pull: { following: username }}),
+                User.updateOne({username: username}, { $pull: { followers: req.user.username }})
+            ]);
             return res.json({
                 status: "OK"
             });

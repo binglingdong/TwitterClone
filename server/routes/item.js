@@ -47,28 +47,27 @@ router.post('/additem', async function(req, res, next) {
         id : id
     });
     if (req.body.childType === 'retweet')
-        Item.findOneAndUpdate({ id: req.body.parent }, { $inc: { retweeted: 1 } }, function(err) {});
+        await Item.updateOne({ id: req.body.parent }, { $inc: { retweeted: 1 } });
 });
 
 router.get('/item/:id', async function(req, res, next) {
-    await Item.findOne({id:req.params.id}, async function (err, result) {
-        if(err || !result){
-            return res.json({
-                status: "error",
-                error: err
-            });
-        }
+    let item = await Item.findOne({id:req.params.id}).select('-likedBy').lean();
+    if(!item){
         return res.json({
-            status: "OK",
-            item: result
+            status: "error",
+            error: "Item doesn't exist"
         });
+    }
+    return res.json({
+        status: "OK",
+        item: item
     });
 });
 
 router.delete('/item/:id', async function(req, res, next) {
     if(!req.user)
         return res.status(404).end();
-    const item = await Item.findOne({id:req.params.id});
+    const item = await Item.findOne({id:req.params.id}).select('username media').lean();
     if(!item || item.username !== req.user.username)
         return res.status(404).end();
     const media = item.media;
@@ -90,16 +89,20 @@ router.delete('/item/:id', async function(req, res, next) {
 
 router.post('/item/:id/like', async function(req, res, next) {
     if(req.body.like) {
-        let item = await Item.findOne({ id: req.params.id });
-        item.property.likes += 1;
-        item.likedBy.push(req.user.username);
-        await item.save();
+        await Item.updateOne({id: req.params.id},
+            {
+                $inc: { 'property.likes': 1 },
+                $addToSet: { likedBy: req.user.username }
+            }
+        );
     }
     else {
-        let item = await Item.findOne({ id: req.params.id });
-        item.property.likes -= 1;
-        item.likedBy = item.likedBy.filter(item => item !== req.user.username);
-        await item.save();    
+        await Item.updateOne({id: req.params.id},
+            {
+                $inc: { 'property.likes': -1 } ,
+                $pull: { likedBy: req.user.username }
+            }
+        );
     }
     return res.json({
         status: 'OK'
