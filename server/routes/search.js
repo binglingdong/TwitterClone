@@ -16,7 +16,7 @@ router.post('/search', async function(req, res, next) {
     const searchString = req.body.q || "";
     //Check constraint.
     if(limit > 100){
-        limit = 200;
+        limit = 100;
     }
     if(unixTime<=0){
         return res.json({
@@ -24,37 +24,18 @@ router.post('/search', async function(req, res, next) {
             error: "Invalid unix time"
         });
     }
-    const searchReg = ".*"+searchString.replace(/ /g, "|") +".*";
-    //console.log(searchReg);
-    const nameReg = ".*"+username+".*";
     let result = [];
-    if(username==="" && searchString === ""){
-        result = await Item.find({timestamp:{$lte: unixTime}});
-    }else if(username === ""){
-        result = await Item.find( 
-                            {$and: [{content: {$regex: searchReg, $options: 'i'}},
-                            {timestamp:{$lte: unixTime}}]}
-                        );
-    }else if(searchString === ""){
-        result = await Item.find( 
-                            {$and:[{username: {$regex: nameReg, $options: 'i' }}, 
-                            {timestamp:{$lte: unixTime}}]}
-                        );
-    }
-    else{
-        result = await Item.find(
-                            {$and: [{username: {$regex: nameReg, $options: 'i' }},
-                            {content: {$regex: searchReg, $options : 'i'}},
-                            {timestamp:{$lte: unixTime}}]}
-                        );    
-    }
-    //NOW result contains all the items that match the username and q. 
-    //NEXT need to filter the following.
-    if(followingCheck){
-        const user = await User.findOne({username:req.user.username});
-        const followings = user.following;
-        result = result.filter(item => followings.includes(item.username));
-    }
+    let query = [{timestamp:{$lte: unixTime}}];
+    searchString && query.push({$text: { $search: searchString}});
+    username && query.push({username:{$eq: username}});
+    followingCheck && query.push({username:{$in: req.user.following}});
+
+    let list = {$and:query};
+
+    result = await Item.find(list);
+    
+
+    //Need to filter for user's own tweet.
     return res.json({
         status: "OK",
         items: result.slice(-limit).reverse()

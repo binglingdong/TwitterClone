@@ -19,6 +19,7 @@ const itemSchema = new Schema({
     timestamp: Number,
     media: [String]
 });
-let model = mongoose.model('Item', itemSchema);
 
+let model = mongoose.model('Item', itemSchema);
+model.collection.createIndex({content: "text"});
 module.exports = model;
