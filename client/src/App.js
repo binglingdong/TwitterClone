@@ -62,6 +62,10 @@ function App(props) {
             q: event.target.searchByString.value,
             username:event.target.searchByUsername.value,
             following: event.target.followingCheck.checked,
+            rank: event.target.rank.value,
+            parent: event.target.parent.value,
+            replies: event.target.isReply.checked,
+            hasMedia: event.target.hasMedia.checked,
         });
         if(!res.data.error){
             setSearchResult(res.data.items);
