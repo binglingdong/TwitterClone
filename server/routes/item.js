@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Item = require('../models/item');
+const Media = require('../models/media');
 const uuidv1 = require('uuid/v1');
 const multer  = require('multer');
 const fs = require('fs')
@@ -14,6 +15,7 @@ const storage = multer.diskStorage({
     }
 });
 const upload = multer({ storage: storage })
+const memcached = require('../config/memcached');
 
 router.post('/additem', async function(req, res, next) {
     if(!req.user){
@@ -27,6 +29,17 @@ router.post('/additem', async function(req, res, next) {
             status: "error",
             error: "Empty content is not allowed"
         });
+    }
+    if(req.body.media) {
+        for(const m of req.body.media) {
+            const media = await Media.findOne({id: m}).select('used owner').lean();
+            if(media.used || media.owner !== req.user.username) {
+                return res.json({
+                    status: "error",
+                    error: "Media already used"
+                });
+            }
+        }
     }
     const id = uuidv1();
     const currentUnixTime = parseInt((new Date().getTime() / 1000).toFixed(0));
@@ -42,12 +55,20 @@ router.post('/additem', async function(req, res, next) {
         media: req.body.media
     });
     await newitem.save();
-    res.json({
+    if(req.body.media) {
+        for(const m of req.body.media) {
+            await Media.updateOne({id: m}, { $set: {used: true} });
+        }
+    }
+    if (req.body.childType === 'retweet') {
+        await Item.updateOne({ id: req.body.parent }, { $inc: { retweeted: 1 } });
+        memcached.del('/item/' + req.body.parent, function (err) {});
+    }
+    memcached.del('/user/' + req.user.username + '/posts', function (err) {});
+    return res.json({
         status: "OK",
         id : id
     });
-    if (req.body.childType === 'retweet')
-        await Item.updateOne({ id: req.body.parent }, { $inc: { retweeted: 1 } });
 });
 
 router.get('/item/:id', async function(req, res, next) {
@@ -75,6 +96,8 @@ router.delete('/item/:id', async function(req, res, next) {
         if(err || result.deletedCount === 0){
             return res.status(404).end();
         }
+        memcached.del('/user/' + req.user.username + '/posts', function (err) {});
+        memcached.del('/item/' + req.params.id, function (err) {});
         res.status(200).end();
         media.forEach(filepath => {
             filepath = path.join(__dirname, '../uploads/' + filepath);
@@ -88,7 +111,16 @@ router.delete('/item/:id', async function(req, res, next) {
 });
 
 router.post('/item/:id/like', async function(req, res, next) {
-    if(req.body.like) {
+    let like = req.body.like;
+    if(like === undefined)
+        like = true;
+    if(like) {
+        const item = await Item.findOne({id: req.params.id}).select('likedBy').lean();
+        if(item.likedBy.includes(req.user.username)) {
+            return res.json({
+                status: 'error'
+            })
+        }
         await Item.updateOne({id: req.params.id},
             {
                 $inc: { 'property.likes': 1 },
@@ -97,6 +129,12 @@ router.post('/item/:id/like', async function(req, res, next) {
         );
     }
     else {
+        const item = await Item.findOne({id: req.params.id}).select('likedBy').lean();
+        if(!item.likedBy.includes(req.user.username)) {
+            return res.json({
+                status: 'error'
+            })
+        }
         await Item.updateOne({id: req.params.id},
             {
                 $inc: { 'property.likes': -1 } ,
@@ -104,6 +142,7 @@ router.post('/item/:id/like', async function(req, res, next) {
             }
         );
     }
+    memcached.del('/item/' + req.params.id, function (err) {});
     return res.json({
         status: 'OK'
     });
@@ -121,14 +160,19 @@ router.get('/item/:id/like', async function(req, res, next) {
     });
 });
 
-router.post('/addmedia', upload.single('media'), async function(req, res, next) {
+router.post('/addmedia', upload.single('content'), async function(req, res, next) {
     if(!req.user) {
         return res.json({
             status: "error",
             error: "Need to login"
         });
     }
-
+    const newMedia = new Media({
+        id: req.file.filename,
+        owner: req.user.username,
+        used: false
+    });
+    await newMedia.save();
     return res.json({
             status: "OK",
             id: req.file.filename

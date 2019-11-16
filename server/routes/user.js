@@ -5,6 +5,7 @@ const User = require('../models/user');
 const Item= require('../models/item');
 const nodemailer = require('nodemailer');
 const uuidv4 = require('uuid/v4');
+const memcached = require('../config/memcached');
 
 router.get('/user',  function(req, res, next) {
     const user = req.user ? req.user.username : null;
@@ -231,6 +232,10 @@ router.post('/follow',  async function(req, res, next) {
                 User.updateOne({username: req.user.username}, { $addToSet: { following: username }}),
                 User.updateOne({username: username}, { $addToSet: { followers: req.user.username }})
             ]);
+            memcached.del('/user/' + req.user.username, function (err) {});
+            memcached.del('/user/' + username, function (err) {});
+            memcached.del('/user/' + req.user.username + "/following", function (err) {});
+            memcached.del('/user/' + username + "/followers", function (err) {});
             return res.json({
                 status: "OK"
             });
@@ -240,6 +245,10 @@ router.post('/follow',  async function(req, res, next) {
                 User.updateOne({username: req.user.username}, { $pull: { following: username }}),
                 User.updateOne({username: username}, { $pull: { followers: req.user.username }})
             ]);
+            memcached.del('/user/' + req.user.username, function (err) {});
+            memcached.del('/user/' + username, function (err) {});
+            memcached.del('/user/' + req.user.username + "/following", function (err) {});
+            memcached.del('/user/' + username + "/followers", function (err) {});
             return res.json({
                 status: "OK"
             });

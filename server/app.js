@@ -28,7 +28,7 @@ mongoose.connect('mongodb://localhost:27017/twitter', {
 });
 require('./config/passport');
 
-const memcached = new Memcached('localhost:11211');
+const memcached = require('./config/memcached');
 
 app.use(cors());
 app.use(logger('dev'));

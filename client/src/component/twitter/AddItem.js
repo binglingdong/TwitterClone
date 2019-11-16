@@ -7,7 +7,7 @@ function AddItem(props) {
     let history = useHistory();
     const [files, setFiles] = useState([]);
     const media = {
-        name: 'media',
+        name: 'content',
         action: '/addmedia',
         showUploadList: {showDownloadIcon: false, showRemoveIcon: false},
         onChange(info) {
