@@ -19,13 +19,13 @@ const memcached = require('../config/memcached');
 
 router.post('/additem', async function(req, res, next) {
     if(!req.user){
-        return res.json({
+        return res.status(500).json({
             status: "error",
             error: "Need to login"
         });
     } 
     if(!req.body.content){
-        return res.json({
+        return res.status(500).json({
             status: "error",
             error: "Empty content is not allowed"
         });
@@ -34,7 +34,7 @@ router.post('/additem', async function(req, res, next) {
         for(const m of req.body.media) {
             const media = await Media.findOne({id: m}).select('used owner').lean();
             if(media.used || media.owner !== req.user.username) {
-                return res.json({
+                return res.status(500).json({
                     status: "error",
                     error: "Media already used"
                 });
@@ -49,6 +49,7 @@ router.post('/additem', async function(req, res, next) {
         content: req.body.content,
         childType: req.body.childType || null,
         parent: req.body.parent,
+        interest: 0,
         retweeted: 0,
         property: { likes:0 },
         timestamp: currentUnixTime,
@@ -61,7 +62,9 @@ router.post('/additem', async function(req, res, next) {
         }
     }
     if (req.body.childType === 'retweet') {
-        await Item.updateOne({ id: req.body.parent }, { $inc: { retweeted: 1 } });
+        await Item.updateOne({ id: req.body.parent }, { 
+            $inc: { retweeted: 1, interest: 1 }
+        });
         memcached.del('/item/' + req.body.parent, function (err) {});
     }
     memcached.del('/user/' + req.user.username + '/posts', function (err) {});
@@ -74,7 +77,7 @@ router.post('/additem', async function(req, res, next) {
 router.get('/item/:id', async function(req, res, next) {
     let item = await Item.findOne({id:req.params.id}).select('-likedBy').lean();
     if(!item){
-        return res.json({
+        return res.status(500).json({
             status: "error",
             error: "Item doesn't exist"
         });
@@ -117,13 +120,13 @@ router.post('/item/:id/like', async function(req, res, next) {
     if(like) {
         const item = await Item.findOne({id: req.params.id}).select('likedBy').lean();
         if(item.likedBy.includes(req.user.username)) {
-            return res.json({
+            return res.status(500).json({
                 status: 'error'
             })
         }
         await Item.updateOne({id: req.params.id},
             {
-                $inc: { 'property.likes': 1 },
+                $inc: { 'property.likes': 1, interest: 1  },
                 $addToSet: { likedBy: req.user.username }
             }
         );
@@ -131,13 +134,13 @@ router.post('/item/:id/like', async function(req, res, next) {
     else {
         const item = await Item.findOne({id: req.params.id}).select('likedBy').lean();
         if(!item.likedBy.includes(req.user.username)) {
-            return res.json({
+            return res.status(500).json({
                 status: 'error'
             })
         }
         await Item.updateOne({id: req.params.id},
             {
-                $inc: { 'property.likes': -1 } ,
+                $inc: { 'property.likes': -1, interest: -1 } ,
                 $pull: { likedBy: req.user.username }
             }
         );
@@ -162,7 +165,7 @@ router.get('/item/:id/like', async function(req, res, next) {
 
 router.post('/addmedia', upload.single('content'), async function(req, res, next) {
     if(!req.user) {
-        return res.json({
+        return res.status(500).json({
             status: "error",
             error: "Need to login"
         });

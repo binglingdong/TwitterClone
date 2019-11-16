@@ -15,7 +15,7 @@ router.post('/search', async function(req, res, next) {
     if(!req.user){
         followingCheck = false;
     }
-    const rank = req.body.rank ||"interest";
+    const rank = req.body.rank || "interest";
     let parent = req.body.parent || "";
     let replies = req.body.replies == undefined ? true : req.body.replies;
     if(!replies) parent = "";
@@ -24,7 +24,7 @@ router.post('/search', async function(req, res, next) {
     const searchString = req.body.q || "";
     //Check constraint.
     if(unixTime<=0){
-        return res.json({
+        return res.status(500).json({
             status: "error",
             error: "Invalid unix time"
         });
@@ -35,9 +35,9 @@ router.post('/search', async function(req, res, next) {
     followingCheck && query.push({username:{$in: req.user.following}});
     media && query.push({'media.0' :{$exists: true}});
     (!replies) && query.push({childType:{$ne: "reply"}});
-    parent && query.push({id:{$eq: parent}});
+    parent && query.push({parent:{$eq: parent}});
     let list = {$and:query};
-    let sort = {retweeted:-1, likedBy:-1};
+    let sort = {interest:-1};
     if(rank == "time") sort = {timestamp:-1}
     const result = await Item.find(list).sort(sort).limit(limit).select('-likedBy').lean();
 

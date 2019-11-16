@@ -11,6 +11,7 @@ const itemSchema = new Schema({
     content: String,
     parent: String,
     childType: String,
+    interest: Number,
     retweeted: Number,
     property:{
         likes: Number,

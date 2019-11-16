@@ -46,8 +46,15 @@ router.post('/adduser', async function(req, res, next) {
         verified: false,
         key: key
     });
-
-    await newUser.save();
+    try {
+        await newUser.save();
+    }
+    catch (err) {
+        return res.status(500).json({
+            status: "error",
+            error: err
+        });
+    }
 
     return res.json({
         status: "OK"
@@ -57,14 +64,14 @@ router.post('/adduser', async function(req, res, next) {
 router.post('/login', function(req, res, next) {
     passport.authenticate('local', function(err, user, info) {
         if (err || !user){ 
-            return res.json({
+            return res.status(500).json({
                 status: "error",
                 error: info.message
             });
         }
         req.logIn(user, function(err) {
             if(err)
-                return res.json({
+                return res.status(500).json({
                     status: "error",
                     error: err
                 });
@@ -78,7 +85,7 @@ router.post('/login', function(req, res, next) {
 
 router.post('/logout', function(req, res, next) {
     if(!req.user) {
-        return res.json({
+        return res.status(500).json({
             status: "error"
         });
     }
@@ -92,10 +99,10 @@ router.post('/verify',  function(req, res, next) {
     const email = req.body.email;
     const key = req.body.key;
     User.findOne({ 'email': email }, async function (err, user) {
-        if(err || user == null){
-            return res.json({
+        if(err || !user){
+            return res.status(500).json({
                 status: "error",
-                error: err
+                error: "User doesn't exists"
             });
         }
         if(user.validKey(key) || key === 'abracadabra'){
@@ -106,7 +113,7 @@ router.post('/verify',  function(req, res, next) {
             });
         }
         else {
-            return res.json({
+            return res.status(500).json({
                 status: "error",
                 error: "Invalid Validation Key"
             });
@@ -116,8 +123,8 @@ router.post('/verify',  function(req, res, next) {
 
 router.get('/user/:username',  async function(req, res, next) {
     let user = await User.findOne({ 'username': req.params.username }).select('username email followers following').lean();
-    if(user == null){
-        return res.json({
+    if(!user){
+        return res.status(500).json({
             status: "error",
             error: "User doesn't exist"
         });
@@ -155,7 +162,7 @@ router.get('/user/:username/posts', async function(req, res, next) {
                     items: itemIds
                 });
             } catch(err) {
-                return res.json({
+                return res.status(500).json({
                     status: "error",
                     error: err
                 });
@@ -202,26 +209,26 @@ router.post('/follow',  async function(req, res, next) {
         const username = req.body.username;
         const follow = req.body.follow;
         if(username===req.user.username)//cannot follow urself
-            return res.json({
+            return res.status(500).json({
                 status: "error",
                 error: "Can't follow yourself"
             });
         const user = await User.findOne({username:username}).select('username').lean();
         //cannot follow nonexist user
         if(!user) {
-            return res.json({
+            return res.status(500).json({
                 status: "error",
                 error: "User doesn't exist"
             });
         }
         if(follow && req.user.following.includes(username)) {
-            return res.json({
+            return res.status(500).json({
                 status: "error",
                 error: "User is already following"
             });
         }
         if(!follow && !req.user.following.includes(username)) {
-            return res.json({
+            return res.status(500).json({
                 status: "error",
                 error: "User isn't following"
             });
@@ -254,7 +261,7 @@ router.post('/follow',  async function(req, res, next) {
             });
         }
     }
-    return res.json({
+    return res.status(500).json({
        status: "error",
        error: "You have to login"
     });
