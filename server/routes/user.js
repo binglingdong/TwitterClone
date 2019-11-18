@@ -38,6 +38,7 @@ router.post('/adduser', async function(req, res, next) {
             console.log(error);
         }
     });
+    transporter.close();
 
     const newUser = new User({
         username: req.body.username,
