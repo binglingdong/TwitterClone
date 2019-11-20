@@ -48,12 +48,13 @@ app.use(passport.session());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'uploads')));
 
-// app.get("/*", function(req, res, next) {
-//     if(req.headers['user-agent'] != undefined && req.headers['requestfrom'] !== 'axios') {
-//         return res.sendFile(path.join(__dirname, './public', 'index.html'));
-//     }
-//     next();
-// });
+app.get("/*", function(req, res, next) {
+    console.log(req.headers);
+    if(req.headers['user-agent'] != undefined && req.headers['requestfrom'] !== 'axios') {
+        return res.sendFile(path.join(__dirname, './public', 'index.html'));
+    }
+    next();
+});
 
 app.get("/*", async function(req, res, next) {
     const key = req.url;

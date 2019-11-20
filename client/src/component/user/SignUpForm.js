@@ -37,7 +37,7 @@ function SignUpForm() {
                         <input type="text" name="email" className="form-control" placeholder="Enter your email" required />
                     </div>
                 </div>
-                <button className="btn btn-outline-dark text-uppercase mt-4" type="submit">Sign Up</button>
+                <button className="btn btn-outline-dark text-uppercase mt-4" type="submit">Register</button>
             </form>
         </div>
     );

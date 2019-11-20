@@ -28,7 +28,7 @@ function LoginForm(props) {
                                 <input type="text" name="password" className="form-control" placeholder="Enter your password" required />
                             </div>
                         </div>
-                        <button className="btn btn-outline-dark text-uppercase mt-4" type="submit">Sign in</button>
+                        <button className="btn btn-outline-dark text-uppercase mt-4" type="submit">Login</button>
                         <Link to="/adduser">Sign Up</Link>
                         <Link to="/verify">Verify</Link>
                     </form>

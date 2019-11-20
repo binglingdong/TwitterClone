@@ -51,7 +51,7 @@ function AddItem(props) {
                         <div className="form-group row">
                             <label htmlFor="content" className="col-sm-3 col-form-label">Tweet</label>
                             <div className="col-sm-7">
-                                <textarea rows="4" cols="50" name="content" required></textarea>
+                                Content: <textarea rows="4" cols="50" name="content" id="content" required></textarea>
                             </div>
                         </div>
                         <Upload {...media}>
@@ -59,7 +59,7 @@ function AddItem(props) {
                                 <Icon type="upload" /> Click to Upload
                             </Button>
                         </Upload>
-                        <button className="btn btn-outline-dark text-uppercase mt-4" type="submit">Tweet</button>
+                        <button className="btn btn-outline-dark text-uppercase mt-4" type="submit">Add Item</button>
                 </form>
             </div>
     );

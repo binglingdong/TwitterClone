@@ -30,7 +30,7 @@ function Verify() {
                                 <input type="text" name="verifyCode" className="form-control" placeholder="Enter your verifaction" required autoFocus />
                             </div>
                     </div>
-                <button className="btn btn-outline-dark text-uppercase mt-4" type="submit">Submit</button>
+                <button className="btn btn-outline-dark text-uppercase mt-4" type="submit">Verify</button>
             </form>
         </div>
     );
