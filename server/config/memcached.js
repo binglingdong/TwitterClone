@@ -1,5 +1,5 @@
 const Memcached = require('memcached');
 
-const memcached = new Memcached('130.245.168.36:11211');
+const memcached = new Memcached('152.44.37.178:11211');
 
 module.exports = memcached;
