@@ -18,6 +18,7 @@ router.post('/adduser', async function(req, res, next) {
     const key = uuidv4();
     
     // create reusable transporter object using the default SMTP transport
+<<<<<<< HEAD
 
     // create reusable transporter object using the default SMTP transport
     // const transporter = nodemailer.createTransport({
@@ -40,6 +41,53 @@ router.post('/adduser', async function(req, res, next) {
     //     subject: 'ValidationKey', // Subject line
     //     text: 'Validation key: <' + key + '>', // plain text body
     // };
+=======
+    const transporter = nodemailer.createTransport({
+        // service:'Gmail',
+        // pool: true,
+        // auth: {
+        //     user: 'lbfmsbu@gmail.com', // generated ethereal user
+        //     pass: 'bing1999lingF'// generated ethereal password
+        // }
+        host: 'localhost',
+        port: 25,
+        tls:{
+            rejectUnauthorized: false
+        }
+    });  
+    
+    const message = {
+        from: '"LBFM" <lbfmsbu@cse356.com>', // sender address
+        to: req.body.email, // list of receivers
+        subject: 'ValidationKey', // Subject line
+        text: 'Validation key: <' + key + '>', // plain text body
+    };
+
+    // transporter.on("idle", function() {
+        transporter.sendMail(message, function(error, info){
+            if (error) {
+                console.log(error);
+            }
+        });
+    // });
+
+    const newUser = new User({
+        username: req.body.username,
+        password: req.body.password,
+        email: req.body.email,
+        verified: false,
+        key: key
+    });
+    try {
+        await newUser.save();
+    }
+    catch (err) {
+        return res.status(500).json({
+            status: "error",
+            error: err
+        });
+    }
+>>>>>>> 32c310d5c1be3e44a8722ea5c8a502887160f76e
 
     // transporter.on("idle", function() {
         // transporter.sendMail(message, async function(error, info){
