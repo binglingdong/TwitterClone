@@ -19,26 +19,33 @@ router.post('/adduser', async function(req, res, next) {
     
     // create reusable transporter object using the default SMTP transport
     const transporter = nodemailer.createTransport({
-        service:'Gmail',
-        auth: {
-            user: 'lbfmsbu@gmail.com', // generated ethereal user
-            pass: 'bing1999lingF'// generated ethereal password
+        // service:'Gmail',
+        // pool: true,
+        // auth: {
+        //     user: 'lbfmsbu@gmail.com', // generated ethereal user
+        //     pass: 'bing1999lingF'// generated ethereal password
+        // }
+        host: 'localhost',
+        port: 25,
+        tls:{
+            rejectUnauthorized: false
         }
     });  
     
     const message = {
-        from: '"LBFM" <lbfmsbu@gmail.com>', // sender address
+        from: '"LBFM" <lbfmsbu@cse356.com>', // sender address
         to: req.body.email, // list of receivers
         subject: 'ValidationKey', // Subject line
         text: 'Validation key: <' + key + '>', // plain text body
     };
 
-    transporter.sendMail(message, function(error, info){
-        if (error) {
-            console.log(error);
-        }
-    });
-    transporter.close();
+    // transporter.on("idle", function() {
+        transporter.sendMail(message, function(error, info){
+            if (error) {
+                console.log(error);
+            }
+        });
+    // });
 
     const newUser = new User({
         username: req.body.username,
