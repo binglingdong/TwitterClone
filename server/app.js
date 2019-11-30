@@ -49,7 +49,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'uploads')));
 
 app.get("/*", function(req, res, next) {
-    console.log(req.headers);
     if(req.headers['user-agent'] != undefined && req.headers['requestfrom'] !== 'axios') {
         return res.sendFile(path.join(__dirname, './public', 'index.html'));
     }
@@ -63,7 +62,7 @@ app.get("/*", async function(req, res, next) {
             const json = res.json;
             res.json = async function(body) {
                 json.call(this, body);
-                memcached.set(key, body, 30, function(err) {});
+                memcached.set(key, body, 3000, function(err) {});
             }
             next();
         // }

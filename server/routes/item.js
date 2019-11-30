@@ -119,9 +119,10 @@ router.post('/item/:id/like', async function(req, res, next) {
         like = true;
     if(like) {
         const item = await Item.findOne({id: req.params.id}).select('likedBy').lean();
-        if(item.likedBy.includes(req.user.username)) {
+        if(!item || item.likedBy.includes(req.user.username)) {
             return res.status(500).json({
-                status: 'error'
+                status: 'error',
+                error: 'liked'
             })
         }
         await Item.updateOne({id: req.params.id},
@@ -133,9 +134,10 @@ router.post('/item/:id/like', async function(req, res, next) {
     }
     else {
         const item = await Item.findOne({id: req.params.id}).select('likedBy').lean();
-        if(!item.likedBy.includes(req.user.username)) {
+        if(!item || !item.likedBy.includes(req.user.username)) {
             return res.status(500).json({
-                status: 'error'
+                status: 'error',
+                error: 'not liked'
             })
         }
         await Item.updateOne({id: req.params.id},
