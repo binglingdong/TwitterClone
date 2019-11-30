@@ -217,41 +217,41 @@ router.post('/follow',  async function(req, res, next) {
     if(req.user) {
         const username = req.body.username;
         const follow = req.body.follow;
-        if(username===req.user.username)//cannot follow urself
-            return res.status(500).json({
-                status: "error",
-                error: "Can't follow yourself"
-            });
-        const user = await User.findOne({username:username}).select('username').lean();
-        //cannot follow nonexist user
-        if(!user) {
-            return res.status(500).json({
-                status: "error",
-                error: "User doesn't exist"
-            });
-        }
-        if(follow && req.user.following.includes(username)) {
-            return res.status(500).json({
-                status: "error",
-                error: "User is already following"
-            });
-        }
-        if(!follow && !req.user.following.includes(username)) {
-            return res.status(500).json({
-                status: "error",
-                error: "User isn't following"
-            });
-        }
+        // if(username===req.user.username)//cannot follow urself
+        //     return res.status(500).json({
+        //         status: "error",
+        //         error: "Can't follow yourself"
+        //     });
+        // const user = await User.findOne({username:username}).select('username').lean();
+        // //cannot follow nonexist user
+        // if(!user) {
+        //     return res.status(500).json({
+        //         status: "error",
+        //         error: "User doesn't exist"
+        //     });
+        // }
+        // if(follow && req.user.following.includes(username)) {
+        //     return res.status(500).json({
+        //         status: "error",
+        //         error: "User is already following"
+        //     });
+        // }
+        // if(!follow && !req.user.following.includes(username)) {
+        //     return res.status(500).json({
+        //         status: "error",
+        //         error: "User isn't following"
+        //     });
+        // }
 
         if(follow){
             await Promise.all([
                 User.updateOne({username: req.user.username}, { $addToSet: { following: username }}),
                 User.updateOne({username: username}, { $addToSet: { followers: req.user.username }})
             ]);
-            memcached.del('/user/' + req.user.username, function (err) {});
-            memcached.del('/user/' + username, function (err) {});
-            memcached.del('/user/' + req.user.username + "/following", function (err) {});
-            memcached.del('/user/' + username + "/followers", function (err) {});
+            // memcached.del('/user/' + req.user.username, function (err) {});
+            // memcached.del('/user/' + username, function (err) {});
+            // memcached.del('/user/' + req.user.username + "/following", function (err) {});
+            // memcached.del('/user/' + username + "/followers", function (err) {});
             return res.json({
                 status: "OK"
             });
@@ -261,10 +261,10 @@ router.post('/follow',  async function(req, res, next) {
                 User.updateOne({username: req.user.username}, { $pull: { following: username }}),
                 User.updateOne({username: username}, { $pull: { followers: req.user.username }})
             ]);
-            memcached.del('/user/' + req.user.username, function (err) {});
-            memcached.del('/user/' + username, function (err) {});
-            memcached.del('/user/' + req.user.username + "/following", function (err) {});
-            memcached.del('/user/' + username + "/followers", function (err) {});
+            // memcached.del('/user/' + req.user.username, function (err) {});
+            // memcached.del('/user/' + username, function (err) {});
+            // memcached.del('/user/' + req.user.username + "/following", function (err) {});
+            // memcached.del('/user/' + username + "/followers", function (err) {});
             return res.json({
                 status: "OK"
             });
