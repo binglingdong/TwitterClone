@@ -30,17 +30,17 @@ router.post('/additem', async function(req, res, next) {
             error: "Empty content is not allowed"
         });
     }
-    if(req.body.media) {
-        for(const m of req.body.media) {
-            const media = await Media.findOne({id: m}).select('used owner').lean();
-            if(media.used || media.owner !== req.user.username) {
-                return res.status(500).json({
-                    status: "error",
-                    error: "Media already used"
-                });
-            }
-        }
-    }
+    // if(req.body.media) {
+    //     for(const m of req.body.media) {
+    //         const media = await Media.findOne({id: m}).select('used owner').lean();
+    //         if(media.used || media.owner !== req.user.username) {
+    //             return res.status(500).json({
+    //                 status: "error",
+    //                 error: "Media already used"
+    //             });
+    //         }
+    //     }
+    // }
     const id = uuidv1();
     const currentUnixTime = parseInt((new Date().getTime() / 1000).toFixed(0));
     const newitem = new Item({
@@ -56,11 +56,11 @@ router.post('/additem', async function(req, res, next) {
         media: req.body.media
     });
     await newitem.save();
-    if(req.body.media) {
-        for(const m of req.body.media) {
-            await Media.updateOne({id: m}, { $set: {used: true} });
-        }
-    }
+    // if(req.body.media) {
+    //     for(const m of req.body.media) {
+    //         await Media.updateOne({id: m}, { $set: {used: true} });
+    //     }
+    // }
     if (req.body.childType === 'retweet') {
         await Item.updateOne({ id: req.body.parent }, { 
             $inc: { retweeted: 1, interest: 1 }
@@ -118,13 +118,13 @@ router.post('/item/:id/like', async function(req, res, next) {
     if(like === undefined)
         like = true;
     if(like) {
-        const item = await Item.findOne({id: req.params.id}).select('likedBy').lean();
-        if(!item || item.likedBy.includes(req.user.username)) {
-            return res.status(500).json({
-                status: 'error',
-                error: 'liked'
-            })
-        }
+        // const item = await Item.findOne({id: req.params.id}).select('likedBy').lean();
+        // if(item && item.likedBy.includes(req.user.username)) {
+        //     return res.status(500).json({
+        //         status: 'error',
+        //         error: 'liked'
+        //     })
+        // }
         await Item.updateOne({id: req.params.id},
             {
                 $inc: { 'property.likes': 1, interest: 1  },
@@ -133,13 +133,13 @@ router.post('/item/:id/like', async function(req, res, next) {
         );
     }
     else {
-        const item = await Item.findOne({id: req.params.id}).select('likedBy').lean();
-        if(!item || !item.likedBy.includes(req.user.username)) {
-            return res.status(500).json({
-                status: 'error',
-                error: 'not liked'
-            })
-        }
+        // const item = await Item.findOne({id: req.params.id}).select('likedBy').lean();
+        // if(item && !item.likedBy.includes(req.user.username)) {
+        //     return res.status(500).json({
+        //         status: 'error',
+        //         error: 'not liked'
+        //     })
+        // }
         await Item.updateOne({id: req.params.id},
             {
                 $inc: { 'property.likes': -1, interest: -1 } ,
